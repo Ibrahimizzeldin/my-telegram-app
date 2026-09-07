@@ -1,345 +1,207 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOM Mining - v3.5 Ultimate</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        body { background-color: #020617; color: #f8fafc; font-family: Tahoma, sans-serif; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .glow-coin { box-shadow: 0 0 50px rgba(234, 179, 8, 0.4); }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #020617; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-    </style>
-</head>
-<body class="min-h-screen pb-28 select-none">
+import sqlite3
+import telebot
+from telebot.types import InlineKeyboardButton, InlineKeyboardMarkup
 
-    <!-- Top Bar -->
-    <div class="flex justify-between items-center p-3.5 bg-slate-900/95 border-b border-slate-800 text-xs backdrop-blur-md sticky top-0 z-40 shadow-md">
-        <div>RATE: <span class="text-amber-400 font-extrabold" id="top-mining-rate">0.0100 TH/s</span></div>
-        <div class="text-[10px] bg-blue-500/10 text-blue-400 px-2 py-0.5 rounded border border-blue-500/20 font-mono">v3.5 LIVE</div>
-        <div>LVL: <span class="text-cyan-400 font-extrabold" id="top-level-badge">1 💎</span></div>
-    </div>
+# ضع توكن البوت الخاص بك هنا
+TOKEN = "YOUR_BOT_TOKEN_HERE"
+bot = telebot.TeleBot(TOKEN)
 
-    <!-- Main Container -->
-    <div class="max-w-md mx-auto p-4">
-
-        <!-- 1. MINE TAB -->
-        <div id="view-mine" class="tab-content active text-center">
-            <!-- Wallet Badge -->
-            <div class="inline-flex items-center gap-2 bg-slate-900 border border-slate-800 px-5 py-2.5 rounded-full my-3 shadow-xl">
-                <i class="fa-solid fa-wallet text-amber-500"></i>
-                <span class="font-black text-lg tracking-wide" id="wallet-balance">0.00</span> 
-                <span class="text-xs text-amber-400 font-bold">TOM</span>
-                <span class="text-xs text-emerald-400 ml-2" id="usd-value">(~$0.00 USD)</span>
-            </div>
-
-            <!-- Coin Graphic with Live Animation -->
-            <div class="relative w-44 h-44 mx-auto my-5 rounded-full bg-gradient-to-tr from-amber-600 via-yellow-500 to-yellow-200 p-1.5 glow-coin flex items-center justify-center animate-pulse">
-                <div class="w-full h-full rounded-full bg-slate-950 flex flex-col items-center justify-center border-4 border-amber-500/40">
-                    <i class="fa-solid fa-coins text-amber-400 text-5xl mb-2"></i>
-                    <span class="text-xs text-amber-200 tracking-widest font-black">TOM MINER</span>
-                </div>
-            </div>
-
-            <!-- Live Ticker Counter -->
-            <div class="text-xs text-slate-400 font-medium mb-1">عداد التعدين الحي المباشر</div>
-            <div class="text-5xl font-black my-2 text-white tracking-wider font-mono drop-shadow-[0_10px_15px_rgba(0,0,0,0.9)]" id="mined-counter">0.0000</div>
-            <div class="text-xs text-amber-400 font-bold mb-4">TOM</div>
-
-            <!-- Action Buttons -->
-            <div class="space-y-3 mt-4">
-                <button onclick="claimRewards()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 font-bold rounded-2xl shadow-lg shadow-blue-900/40 transition active:scale-95 text-lg border border-blue-400/30 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-hand-holding-dollar"></i> Claim Mined TOM
-                </button>
-                <button onclick="showAd()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black rounded-2xl shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2 active:scale-95">
-                    <i class="fa-solid fa-play"></i> Watch Ad for +5 TOM Bonus
-                </button>
-            </div>
-        </div>
-
-        <!-- 2. QUESTS TAB -->
-        <div id="view-quests" class="tab-content space-y-3">
-            <h2 class="text-lg font-bold mb-1">Earn Rewards</h2>
-            <p class="text-xs text-slate-400 mb-4">Complete quests and earn TOM directly into your wallet</p>
-            
-            <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between shadow-md">
-                <div>
-                    <h4 class="font-bold text-sm">Daily Check-in</h4>
-                    <p class="text-xs text-amber-400 font-bold">+5 TOM</p>
-                </div>
-                <button onclick="claimQuest(5, 'تم استلام مكافأة تسجيل الدخول اليومي!')" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-xl text-xs font-bold transition">Claim</button>
-            </div>
-
-            <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between shadow-md">
-                <div>
-                    <h4 class="font-bold text-sm">Join Telegram Channel</h4>
-                    <p class="text-xs text-emerald-400 font-bold">Claimed</p>
-                </div>
-                <i class="fa-solid fa-check-circle text-emerald-500 text-xl"></i>
-            </div>
-        </div>
-
-        <!-- 3. BOOST & LEVELS TAB (1 to 50) -->
-        <div id="view-boost" class="tab-content space-y-3">
-            <div class="flex justify-between items-center mb-2">
-                <div>
-                    <h2 class="text-lg font-bold">Mining Levels (1 - 50)</h2>
-                    <p class="text-xs text-slate-400">Upgrade levels to multiply your mining rate</p>
-                </div>
-            </div>
-
-            <!-- Dynamic Levels Container -->
-            <div id="levels-container" class="space-y-2.5 max-h-[65vh] overflow-y-auto pr-1">
-                <!-- Javascript populates levels 1 to 50 -->
-            </div>
-        </div>
-
-        <!-- 4. FRIENDS TAB -->
-        <div id="view-friends" class="tab-content space-y-4">
-            <h2 class="text-lg font-bold">Referral Syndicate</h2>
-            <p class="text-xs text-slate-400">Invite friends to mine TOM together! Earn 100 TOM upfront.</p>
-            
-            <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-lg">
-                <span class="text-xs text-slate-400">Your Invite Link</span>
-                <div class="bg-slate-950 p-2.5 rounded-xl text-xs text-cyan-400 truncate mt-1 mb-3 border border-slate-800" id="ref-link">https://t.me/EarnTapAdssbot/app?start=ref_6773951150</div>
-                <button onclick="navigator.clipboard.writeText(document.getElementById('ref-link').innerText); alert('تم نسخ الرابط بنجاح!');" class="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-xl text-xs font-bold transition shadow-md">Share on Telegram</button>
-            </div>
-        </div>
-
-        <!-- 5. PROFILE TAB -->
-        <div id="view-profile" class="tab-content space-y-4">
-            <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center gap-3 shadow-lg">
-                <div class="w-12 h-12 rounded-full bg-amber-500 flex items-center justify-center font-bold text-slate-950 text-xl shadow-md">أ</div>
-                <div>
-                    <h3 class="font-bold text-sm">أبو تميم</h3>
-                    <p class="text-xs text-slate-400 font-mono">ID: 6773951150</p>
-                </div>
-            </div>
-
-            <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3 shadow-lg">
-                <div class="flex justify-between text-sm">
-                    <span class="text-slate-400">Total Assets:</span>
-                    <span class="font-bold text-amber-400" id="profile-total">0.00 TOM</span>
-                </div>
-                <div class="flex justify-between text-sm">
-                    <span class="text-slate-400">Current Level:</span>
-                    <span class="font-bold text-cyan-400" id="profile-level">Level 1</span>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Bottom Navigation Bar -->
-    <div class="fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-lg border-t border-slate-800 flex justify-around py-3 max-w-md mx-auto z-50 text-xs shadow-2xl">
-        <button onclick="switchTab('mine')" class="nav-btn text-blue-400 flex flex-col items-center gap-1 transition" data-target="mine">
-            <i class="fa-solid fa-hammer text-lg"></i> Mine
-        </button>
-        <button onclick="switchTab('quests')" class="nav-btn text-slate-400 hover:text-slate-200 flex flex-col items-center gap-1 transition" data-target="quests">
-            <i class="fa-solid fa-star text-lg"></i> Quests
-        </button>
-        <button onclick="switchTab('boost')" class="nav-btn text-slate-400 hover:text-slate-200 flex flex-col items-center gap-1 transition" data-target="boost">
-            <i class="fa-solid fa-bolt text-lg"></i> Boost
-        </button>
-        <button onclick="switchTab('friends')" class="nav-btn text-slate-400 hover:text-slate-200 flex flex-col items-center gap-1 transition" data-target="friends">
-            <i class="fa-solid fa-users text-lg"></i> Friends
-        </button>
-        <button onclick="switchTab('profile')" class="nav-btn text-slate-400 hover:text-slate-200 flex flex-col items-center gap-1 transition" data-target="profile">
-            <i class="fa-solid fa-gear text-lg"></i> Profile
-        </button>
-    </div>
-
-    <script>
-        // Tab Navigation
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-' + tabName).classList.add('active');
-            
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('text-blue-400');
-                btn.classList.add('text-slate-400');
-                if(btn.dataset.target === tabName) {
-                    btn.classList.remove('text-slate-400');
-                    btn.classList.add('text-blue-400');
-                }
-            });
-        }
-
-        // State Management
-        let walletBalance = parseFloat(localStorage.getItem('tom_balance') || '0.00');
-        let minedCounter = parseFloat(localStorage.getItem('tom_mined') || '0.0000');
-        let currentLevel = parseInt(localStorage.getItem('tom_level') || '1');
-
-        // Mining Rate: Starts at 0.01, increases by 0.005 per level
-        function getMiningRate(lvl) {
-            return 0.01 + (lvl - 1) * 0.005;
-        }
-
-        // Level Cost: Level 2 = 10 TOM, doubles each subsequent level (10, 20, 40, 80...)
-        function getLevelCost(lvl) {
-            if (lvl <= 1) return 0;
-            if (lvl === 2) return 10;
-            return 10 * Math.pow(2, lvl - 2);
-        }
-
-        // High-Speed Live Counter Ticker (Updates every 200ms for ultra-smooth visible counting)
-        setInterval(() => {
-            let rate = getMiningRate(currentLevel);
-            // Increment per 200ms tick = rate / 5
-            let increment = (rate / 5) * 0.1; 
-            minedCounter += increment;
-            document.getElementById('mined-counter').innerText = minedCounter.toFixed(4);
-            localStorage.setItem('tom_mined', minedCounter);
-        }, 200);
-
-        // Claim Mined Coins
-        function claimRewards() {
-            if (minedCounter < 0.0005) {
-                alert('انتظر قليلاً لتراكم رصيد كافٍ للجمع!');
-                return;
-            }
-            walletBalance += minedCounter;
-            minedCounter = 0.0000;
-            localStorage.setItem('tom_balance', walletBalance);
-            localStorage.setItem('tom_mined', minedCounter);
-            updateDisplays();
-            renderLevels();
-            alert('تم جمع أرباح التعدين وإضافتها إلى رصيدك بنجاح!');
-        }
-
-        // Claim Quests
-        function claimQuest(amount, msg) {
-            walletBalance += amount;
-            localStorage.setItem('tom_balance', walletBalance);
-            updateDisplays();
-            renderLevels();
-            alert(msg);
-        }
-
-        // Upgrade Level Logic
-        function upgradeLevel(targetLevel) {
-            let cost = getLevelCost(targetLevel);
-            if (walletBalance >= cost) {
-                walletBalance -= cost;
-                currentLevel = targetLevel;
-                localStorage.setItem('tom_balance', walletBalance);
-                localStorage.setItem('tom_level', currentLevel);
-                updateDisplays();
-                renderLevels();
-                alert(`مبروك! تم ترقية التعدين إلى المستوى ${currentLevel} بنجاح.`);
-            } else {
-                alert(`رصيدك غير كافٍ! تحتاج إلى ${cost} TOM لفتح هذا المستوى.`);
-            }
-        }
-
-        // Render Levels 1 to 50
-        function renderLevels() {
-            let container = document.getElementById('levels-container');
-            container.innerHTML = '';
-
-            for (let i = 1; i <= 50; i++) {
-                let rate = getMiningRate(i);
-                let cost = getLevelCost(i);
-                let isCurrent = (i === currentLevel);
-                let isUnlocked = (i <= currentLevel);
-                let canAfford = (walletBalance >= cost);
-
-                let statusBadge = '';
-                let btnHTML = '';
-
-                if (isCurrent) {
-                    statusBadge = `<span class="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">ACTIVE</span>`;
-                    btnHTML = `<div class="py-1 px-3 bg-emerald-500/20 text-emerald-400 text-xs rounded-xl font-bold text-center">Active</div>`;
-                } else if (isUnlocked) {
-                    statusBadge = `<span class="text-xs text-cyan-400 font-bold bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">UNLOCKED</span>`;
-                    btnHTML = `<button onclick="currentLevel=${i}; localStorage.setItem('tom_level', currentLevel); updateDisplays(); renderLevels();" class="py-1 px-3 bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs rounded-xl font-bold transition">Select</button>`;
-                } else if (i === currentLevel + 1) {
-                    statusBadge = `<span class="text-xs text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">${cost} TOM</span>`;
-                    btnHTML = `<button onclick="upgradeLevel(${i})" class="py-1.5 px-3 ${canAfford ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-900/30' : 'bg-slate-800 text-slate-500 cursor-not-allowed'} text-xs rounded-xl font-bold transition">Unlock</button>`;
-                } else {
-                    statusBadge = `<span class="text-xs text-slate-500 font-bold bg-slate-800/50 px-2 py-0.5 rounded">${cost} TOM</span>`;
-                    btnHTML = `<button disabled class="py-1.5 px-3 bg-slate-900 text-slate-600 text-xs rounded-xl font-bold cursor-not-allowed">Locked</button>`;
-                }
-
-                let cardClass = isCurrent ? 'border-emerald-500/50 bg-slate-900/90' : (isUnlocked ? 'border-cyan-500/30 bg-slate-900/60' : 'border-slate-800/80 bg-slate-950/40 opacity-70');
-
-                let html = `
-                    <div class="border ${cardClass} p-3 rounded-2xl flex items-center justify-between shadow-md transition">
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h3 class="font-bold text-sm text-white">Level ${i}</h3>
-                                ${statusBadge}
-                            </div>
-                            <p class="text-xs text-slate-400 mt-0.5">Rate: <span class="text-amber-400 font-mono">${rate.toFixed(4)} TH/s</span></p>
-                        </div>
-                        <div>${btnHTML}</div>
-                    </div>
-                `;
-                container.innerHTML += html;
-            }
-        }
-
-        // AdsGram Integration with Fallback
-        let adController = null;
-        try {
-            if (window.Adsgram) {
-                adController = window.Adsgram.init({ blockId: "46651" });
-            }
-        } catch(e) {
-            console.log("Ads fallback active");
-        }
-
-        function showAd() {
-            if (adController) {
-                adController.show().then(() => {
-                    walletBalance += 5.0;
-                    localStorage.setItem('tom_balance', walletBalance);
-                    updateDisplays();
-                    renderLevels();
-                    alert('مبروك! تم منحك مكافأة الإعلان (+5 TOM) بنجاح.');
-                }).catch(() => {
-                    walletBalance += 5.0;
-                    localStorage.setItem('tom_balance', walletBalance);
-                    updateDisplays();
-                    renderLevels();
-                    alert('تم احتساب المكافأة التجريبية بنجاح (+5 TOM).');
-                });
-            } else {
-                walletBalance += 5.0;
-                localStorage.setItem('tom_balance', walletBalance);
-                updateDisplays();
-                renderLevels();
-                alert('نظام الإعلانات غير متاح مؤقتاً، وتم إضافة رصيد مكافأة تجريبي (+5 TOM)!');
-            }
-        }
-
-        // Update UI displays
-        function updateDisplays() {
-            document.getElementById('wallet-balance').innerText = walletBalance.toFixed(2);
-            document.getElementById('profile-total').innerText = walletBalance.toFixed(2) + ' TOM';
-            document.getElementById('profile-level').innerText = `Level ${currentLevel}`;
-            document.getElementById('top-level-badge').innerText = `${currentLevel} 💎`;
-            
-            let currentRate = getMiningRate(currentLevel);
-            document.getElementById('top-mining-rate').innerText = currentRate.toFixed(4) + ' TH/s';
-
-            let usd = (walletBalance * 0.00145).toFixed(2);
-            document.getElementById('usd-value').innerText = `(~$${usd} USD)`;
-        }
-
-        // Initialize on load
-        window.onload = function() {
-            updateDisplays();
-            renderLevels();
-            document.getElementById('mined-counter').innerText = minedCounter.toFixed(4);
-        };
-    </script>
-</body>
-    </html>
+def init_db():
+    conn = sqlite3.connect("mining_bot.db")
+    cursor = conn.cursor()
     
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            user_id INTEGER PRIMARY KEY,
+            username TEXT,
+            balance REAL DEFAULT 0.0,
+            current_level INTEGER DEFAULT 1,
+            referrer_id INTEGER,
+            is_premium INTEGER DEFAULT 0
+        )
+    """)
+    
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS levels (
+            level_id INTEGER PRIMARY KEY,
+            cost REAL,
+            mining_speed REAL
+        )
+    """)
+    
+    cursor.execute("SELECT COUNT(*) FROM levels")
+    if cursor.fetchone()[0] == 0:
+        levels_data = [
+            (1, 0, 1.0),
+            (2, 100, 2.5),
+            (3, 300, 6.0),
+            (4, 700, 15.0),
+            (5, 1500, 35.0),
+            (6, 3500, 80.0),
+            (7, 8000, 200.0)
+        ]
+        cursor.executemany("INSERT OR IGNORE INTO levels VALUES (?, ?, ?)", levels_data)
+        
+    conn.commit()
+    conn.close()
+
+init_db()
+
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    user_id = message.from_user.id
+    username = message.from_user.username
+    is_premium = 1 if getattr(message.from_user, 'is_premium', False) else 0
+
+    conn = sqlite3.connect("mining_bot.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT user_id, referrer_id FROM users WHERE user_id = ?", (user_id,))
+    user = cursor.fetchone()
+    
+    args = message.text.split()
+    referrer_id = None
+    if len(args) > 1 and args[1].isdigit():
+        potential_ref = int(args[1])
+        if potential_ref != user_id:
+            referrer_id = potential_ref
+
+    if not user:
+        cursor.execute("""
+            INSERT INTO users (user_id, username, balance, current_level, referrer_id, is_premium)
+            VALUES (?, ?, 0.0, 1, ?, ?)
+        """, (user_id, username, referrer_id, is_premium))
+        
+        if referrer_id:
+            bonus = 150 if is_premium else 50
+            cursor.execute("UPDATE users SET balance = balance + ? WHERE user_id = ?", (bonus, referrer_id))
+            try:
+                bot.send_message(referrer_id, f"🎉 انضم صديق جديد عبر رابط إحالتك! حصلت على مكافأة فورية قدرها {bonus} نقطة.")
+            except:
+                pass
+                
+        conn.commit()
+    
+    conn.close()
+    
+    markup = InlineKeyboardMarkup()
+    markup.add(InlineKeyboardButton("⛏ لوحة التحكم والتعدين", callback_data="main_menu"))
+    markup.add(InlineKeyboardButton("👥 نظام الإحالات", callback_data="referral_menu"))
+    
+    bot.send_message(message.chat.id, "أهلاً بك في بوت التعدين والمستويات! 🚀\nاختر من القائمة أدناه:", reply_markup=markup)
+
+@bot.callback_query_handler(func=lambda call: call.data == "levels_menu" or call.data == "main_menu")
+def show_levels(call):
+    user_id = call.from_user.id
+    conn = sqlite3.connect("mining_bot.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT balance, current_level FROM users WHERE user_id = ?", (user_id,))
+    user = cursor.fetchone()
+    balance = user[0]
+    current_level = user[1]
+    
+    cursor.execute("SELECT level_id, cost, mining_speed FROM levels ORDER BY level_id ASC")
+    all_levels = cursor.fetchall()
+    conn.close()
+    
+    text = f"💰 رصيدك الحالي: {round(balance, 2)} نقطة\n⭐ مستواك الحالي: Level {current_level}\n\nاختر المستوى:"
+    markup = InlineKeyboardMarkup(row_width=1)
+    
+    for lvl in all_levels:
+        lvl_id, cost, speed = lvl
+        
+        if lvl_id < current_level:
+            btn_text = f"✅ مستوى {lvl_id} (مكتمل ومجمد)"
+            callback = f"noop_{lvl_id}"
+        elif lvl_id == current_level:
+            btn_text = f"🔥 مستوى {lvl_id} (نشط حالياً - {speed} ن/س)"
+            callback = f"noop_{lvl_id}"
+        elif lvl_id == current_level + 1:
+            btn_text = f"🔓 فتح مستوى {lvl_id} (التكلفة: {cost} نقطة)"
+            callback = f"unlock_{lvl_id}"
+        else:
+            btn_text = f"🔒 مستوى {lvl_id} (مغلق)"
+            callback = f"noop_{lvl_id}"
+            
+        markup.add(InlineKeyboardButton(btn_text, callback_data=callback))
+        
+    markup.add(InlineKeyboardButton("🔙 رجوع للقائمة الرئيسية", callback_data="main_menu"))
+    
+    if call.message.text:
+        bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=markup)
+    else:
+        bot.send_message(call.message.chat.id, text, reply_markup=markup)
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("unlock_"))
+def unlock_level(call):
+    user_id = call.from_user.id
+    target_level = int(call.data.split("_")[1])
+    
+    conn = sqlite3.connect("mining_bot.db")
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT balance, current_level FROM users WHERE user_id = ?", (user_id,))
+    user = cursor.fetchone()
+    balance, current_level = user[0], user[1]
+    
+    if target_level != current_level + 1:
+        bot.answer_callback_query(call.id, "❌ لا يمكنك تخطي المستويات!")
+        conn.close()
+        return
+        
+    cursor.execute("SELECT cost FROM levels WHERE level_id = ?", (target_level,))
+    cost = cursor.fetchone()[0]
+    
+    if balance >= cost:
+        new_balance = balance - cost
+        cursor.execute("UPDATE users SET balance = ?, current_level = ? WHERE user_id = ?", (new_balance, target_level, user_id))
+        conn.commit()
+        bot.answer_callback_query(call.id, f"🎉 مبروك! تم فتح المستوى {target_level} بنجاح.")
+    else:
+        bot.answer_callback_query(call.id, f"⚠️ رصيدك غير كافٍ! تحتاج إلى {cost} نقطة.")
+        
+    conn.close()
+    show_levels(call)
+
+@bot.callback_query_handler(func=lambda call: call.data.startswith("noop_"))
+def noop_action(call):
+    bot.answer_callback_query(call.id, "هذا المستوى مجمد أو مغلق ولا يمكن التراجع عنه.")
+
+@bot.callback_query_handler(func=lambda call: call.data == "referral_menu")
+def referral_menu(call):
+    user_id = call.from_user.id
+    bot_info = bot.get_me()
+    ref_link = f"https://t.me/{bot_info.username}?start={user_id}"
+    
+    conn = sqlite3.connect("mining_bot.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT COUNT(*) FROM users WHERE referrer_id = ?", (user_id,))
+    ref_count = cursor.fetchone()[0]
+    conn.close()
+    
+    text = (
+        f"👥 **نظام الإحالات والأصدقاء**\n\n"
+        f"• ادعُ أصدقاءك واحصل على مكافأة فورية (مضاعفة لحسابات بريميوم!)\n"
+        f"• احصل على نسبة مستمرة من تعدين أصدقائك.\n\n"
+        f"🔗 رابط الإحالة الخاص بك:\n`{ref_link}`\n\n"
+        f"📊 عدد الأصدقاء المدعوين: {ref_count}"
+    )
+    
+    markup = InlineKeyboardMarkup()
+    markup.add(InlineKeyboardButton("🔙 رجوع", callback_data="main_menu"))
+    
+    bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=markup, parse_mode="Markdown")
+
+@bot.callback_query_handler(func=lambda call: call.data == "main_menu")
+def main_menu(call):
+    text = "أهلاً بك في لوحة التحكم الرئيسية للتعدين:"
+    markup = InlineKeyboardMarkup()
+    markup.add(InlineKeyboardButton("⭐ ترقية المستويات", callback_data="levels_menu"))
+    markup.add(InlineKeyboardButton("👥 نظام الإحالات", callback_data="referral_menu"))
+    
+    bot.edit_message_text(text, call.message.chat.id, call.message.message_id, reply_markup=markup)
+
+if __name__ == "__main__":
+    print("Bot is running...")
+    bot.infinity_polling()
