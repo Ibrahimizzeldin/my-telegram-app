@@ -3,26 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EarnTapAds App</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>EarnTap Ads App</title>
+    <!-- مكتبة AdsGram الرسمية -->
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     <style>
-        body { font-family: sans-serif; text-align: center; background: #1c2733; color: white; padding: 20px; }
-        button { background: #2481cc; color: white; border: none; padding: 15px 30px; font-size: 18px; border-radius: 10px; cursor: pointer; margin-top: 20px; }
+        body {
+            font-family: Tahoma, sans-serif;
+            text-align: center;
+            background-color: #18191a;
+            color: #ffffff;
+            margin-top: 80px;
+        }
+        .container {
+            padding: 20px;
+        }
+        button {
+            background-color: #2481cc;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 25px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        button:active {
+            transform: scale(0.98);
+        }
     </style>
 </head>
 <body>
-    <h1>مرحباً بك في التطبيق</h1>
-    <p>اضغط للربح ومشاهدة الإعلانات</p>
-    <button onclick="showAd()">مشاهدة إعلان</button>
+
+    <div class="container">
+        <h1>تطبيق الأرباح - EarnTap</h1>
+        <p>شاهد الإعلان واحصل على مكافأتك الفورية</p>
+        
+        <button onclick="showRewardedAd()">شاهد الإعلان واربح</button>
+    </div>
 
     <script>
-        const Telegram = window.Telegram.WebApp;
-        Telegram.ready();
-        Telegram.expand();
+        // تهيئة وحدة الإعلانات بالمعرّف الصحيح 46651
+        const adController = window.Adsgram.init({ blockId: "46651" });
 
-        function showAd() {
-            alert("التطبيق يعمل بنجاح!");
+        function showRewardedAd() {
+            adController.show()
+                .then((result) => {
+                    // نجاح مشاهدة الإعلان بالكامل
+                    alert("تهانينا! تم إكمال الإعلان بنجاح وتم منح المكافأة.");
+                })
+                .catch((err) => {
+                    // إغلاق الإعلان قبل اكتماله أو حدوث خطأ
+                    alert("لم يتم إكمال مشاهدة الإعلان.");
+                });
         }
     </script>
 </body>
