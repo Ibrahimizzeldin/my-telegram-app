@@ -3,22 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EarnTap - Mining App</title>
+    <title>EarnTap - TOM Mining Ecosystem</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background-color: #030712; color: #f3f4f6; font-family: Tahoma, sans-serif; }
+        body { background-color: #020617; color: #f8fafc; font-family: Tahoma, sans-serif; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        .glow-coin { box-shadow: 0 0 40px rgba(234, 179, 8, 0.3); }
+        /* تخصيص شريط التمرير لقائمة المستويات */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
     </style>
 </head>
-<body class="min-h-screen pb-24 select-none">
+<body class="min-h-screen pb-28 select-none">
 
     <!-- Top Bar -->
-    <div class="flex justify-between items-center p-4 bg-gray-900/50 border-b border-gray-800 text-xs">
-        <div>MINING RATE: <span class="text-yellow-400 font-bold" id="mining-rate">0.2067 TH/s</span></div>
-        <div>CURRENT RANK: <span class="text-blue-400 font-bold">Level 3 💎</span></div>
+    <div class="flex justify-between items-center p-4 bg-slate-900/90 border-b border-slate-800 text-xs backdrop-blur-md sticky top-0 z-40">
+        <div>RATE: <span class="text-amber-400 font-bold" id="top-mining-rate">0.0100 TH/s</span></div>
+        <div>LEVEL: <span class="text-cyan-400 font-bold" id="top-level-badge">1 💎</span></div>
     </div>
 
     <!-- Main Container -->
@@ -27,107 +32,104 @@
         <!-- 1. MINE TAB -->
         <div id="view-mine" class="tab-content active text-center">
             <!-- Wallet Badge -->
-            <div class="inline-flex items-center gap-2 bg-gray-900 border border-gray-800 px-4 py-2 rounded-full my-4 shadow-lg">
-                <i class="fa-solid fa-wallet text-yellow-500"></i>
-                <span class="font-bold text-lg" id="wallet-balance">248.69</span> <span class="text-sm text-gray-400">PTC</span>
-                <span class="text-xs text-green-400 ml-2" id="usd-value">(~$0.36 USD)</span>
+            <div class="inline-flex items-center gap-2 bg-slate-900 border border-slate-800 px-5 py-2.5 rounded-full my-3 shadow-xl">
+                <i class="fa-solid fa-wallet text-amber-500"></i>
+                <span class="font-black text-lg tracking-wide" id="wallet-balance">0.00</span> 
+                <span class="text-xs text-amber-400 font-bold">TOM</span>
+                <span class="text-xs text-emerald-400 ml-2" id="usd-value">(~$0.00 USD)</span>
             </div>
 
-            <!-- Coin Graphic -->
-            <div class="relative w-48 h-48 mx-auto my-6 rounded-full bg-gradient-to-tr from-amber-600 to-yellow-300 p-1 shadow-2xl flex items-center justify-center">
-                <div class="w-full h-full rounded-full bg-gray-950 flex flex-col items-center justify-center border-4 border-yellow-500/50">
-                    <i class="fa-solid fa-coins text-yellow-400 text-5xl mb-2 animate-pulse"></i>
-                    <span class="text-xs text-yellow-200 tracking-widest font-bold">EARNTAP</span>
+            <!-- Coin Graphic with Live Animation -->
+            <div class="relative w-44 h-44 mx-auto my-5 rounded-full bg-gradient-to-tr from-amber-600 via-yellow-500 to-yellow-200 p-1.5 glow-coin flex items-center justify-center animate-pulse">
+                <div class="w-full h-full rounded-full bg-slate-950 flex flex-col items-center justify-center border-4 border-amber-500/40">
+                    <i class="fa-solid fa-coins text-amber-400 text-5xl mb-2"></i>
+                    <span class="text-xs text-amber-200 tracking-widest font-black">TOM MINER</span>
                 </div>
             </div>
 
-            <!-- Counter -->
-            <div class="text-4xl font-black my-4 text-white tracking-wider" id="mined-counter">+8.4513</div>
+            <!-- Live Ticker Counter -->
+            <div class="text-xs text-slate-400 font-medium mb-1">الأرباح القابلة للجمع المباشر</div>
+            <div class="text-5xl font-black my-2 text-white tracking-wider font-mono drop-shadow-[0_10px_10px_rgba(0,0,0,0.8)]" id="mined-counter">0.0000+</div>
+            <div class="text-xs text-amber-400 font-bold mb-4">TOM</div>
 
             <!-- Action Buttons -->
-            <div class="space-y-3 mt-6">
-                <button onclick="claimRewards()" class="w-full py-4 bg-blue-600 hover:bg-blue-500 font-bold rounded-2xl shadow-lg transition active:scale-95 text-lg">
-                    Claim
+            <div class="space-y-3 mt-4">
+                <button onclick="claimRewards()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 font-bold rounded-2xl shadow-lg shadow-blue-900/40 transition active:scale-95 text-lg border border-blue-400/30 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-hand-holding-dollar"></i> Claim Mined TOM
                 </button>
-                <button onclick="showAd()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-gray-950 font-black rounded-2xl shadow-lg transition flex items-center justify-center gap-2 active:scale-95">
-                    <i class="fa-solid fa-play"></i> Watch Ad for +0.5 TH/s Boost (+1h)
+                <button onclick="showAd()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black rounded-2xl shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2 active:scale-95">
+                    <i class="fa-solid fa-play"></i> Watch Ad for +5 TOM Bonus
                 </button>
             </div>
         </div>
 
         <!-- 2. QUESTS TAB -->
         <div id="view-quests" class="tab-content space-y-3">
-            <h2 class="text-lg font-bold mb-2">Earn Rewards</h2>
-            <p class="text-xs text-gray-400 mb-4">Complete quests and earn PTC directly into your wallet</p>
+            <h2 class="text-lg font-bold mb-1">Earn Rewards</h2>
+            <p class="text-xs text-slate-400 mb-4">Complete quests and earn TOM directly into your wallet</p>
             
-            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl flex items-center justify-between">
+            <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between shadow-md">
                 <div>
                     <h4 class="font-bold text-sm">Daily Check-in</h4>
-                    <p class="text-xs text-yellow-400">+5 PTC</p>
+                    <p class="text-xs text-amber-400 font-bold">+5 TOM</p>
                 </div>
-                <button onclick="alert('تم استلام مكافأة تسجيل الدخول اليومي!')" class="px-4 py-2 bg-blue-600 rounded-xl text-xs font-bold">Claim</button>
+                <button onclick="claimQuest(5, 'تم استلام مكافأة تسجيل الدخول اليومي!')" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-xl text-xs font-bold transition">Claim</button>
             </div>
 
-            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl flex items-center justify-between">
+            <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between shadow-md">
                 <div>
                     <h4 class="font-bold text-sm">Join Telegram Channel</h4>
-                    <p class="text-xs text-gray-400">Claimed</p>
+                    <p class="text-xs text-emerald-400 font-bold">Claimed</p>
                 </div>
-                <i class="fa-solid fa-check-circle text-green-500 text-xl"></i>
+                <i class="fa-solid fa-check-circle text-emerald-500 text-xl"></i>
             </div>
         </div>
 
-        <!-- 3. BOOST TAB -->
-        <div id="view-boost" class="tab-content space-y-4">
-            <h2 class="text-lg font-bold">Boost Mining Speed</h2>
-            <p class="text-xs text-gray-400">Upgrade your mining gear to earn more PTC per second</p>
+        <!-- 3. BOOST & LEVELS TAB (1 to 50) -->
+        <div id="view-boost" class="tab-content space-y-3">
+            <div class="flex justify-between items-center mb-2">
+                <div>
+                    <h2 class="text-lg font-bold">Mining Levels</h2>
+                    <p class="text-xs text-slate-400">Upgrade up to Level 50 to maximize your mining power</p>
+                </div>
+            </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <div class="bg-gray-900 border border-green-500/50 p-3 rounded-2xl">
-                    <span class="text-xs text-green-400 font-bold">ACTIVE</span>
-                    <h3 class="font-bold mt-1">Level 3</h3>
-                    <p class="text-xs text-gray-400">+0.207 TH/s</p>
-                    <div class="mt-3 py-1.5 bg-green-500/20 text-green-400 text-center text-xs rounded-xl font-bold">Active</div>
-                </div>
-                <div class="bg-gray-900 border border-gray-800 p-3 rounded-2xl opacity-75">
-                    <span class="text-xs text-blue-400 font-bold">LOCKED</span>
-                    <h3 class="font-bold mt-1">Level 4</h3>
-                    <p class="text-xs text-gray-400">+0.210 TH/s</p>
-                    <button class="mt-3 w-full py-1.5 bg-blue-600 text-white text-xs rounded-xl font-bold">251 PTC</button>
-                </div>
+            <!-- Dynamic Levels Container -->
+            <div id="levels-container" class="space-y-2.5 max-h-[65vh] overflow-y-auto pr-1">
+                <!-- Javascript will populate levels 1 to 50 here -->
             </div>
         </div>
 
         <!-- 4. FRIENDS TAB -->
         <div id="view-friends" class="tab-content space-y-4">
             <h2 class="text-lg font-bold">Referral Syndicate</h2>
-            <p class="text-xs text-gray-400">Invite friends to mine together! Earn 100 PTC upfront.</p>
+            <p class="text-xs text-slate-400">Invite friends to mine TOM together! Earn 100 TOM upfront.</p>
             
-            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl">
-                <span class="text-xs text-gray-400">Your Invite Link</span>
-                <div class="bg-gray-950 p-2.5 rounded-xl text-xs text-blue-400 truncate mt-1 mb-3" id="ref-link">https://t.me/EarnTapAdssbot/app?start=ref_6773951150</div>
-                <button onclick="navigator.clipboard.writeText(document.getElementById('ref-link').innerText); alert('تم كوبي الرابط بنجاح!');" class="w-full py-3 bg-blue-600 rounded-xl text-xs font-bold">Share on Telegram</button>
+            <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-lg">
+                <span class="text-xs text-slate-400">Your Invite Link</span>
+                <div class="bg-slate-950 p-2.5 rounded-xl text-xs text-cyan-400 truncate mt-1 mb-3 border border-slate-800" id="ref-link">https://t.me/EarnTapAdssbot/app?start=ref_6773951150</div>
+                <button onclick="navigator.clipboard.writeText(document.getElementById('ref-link').innerText); alert('تم نسخ الرابط بنجاح!');" class="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-xl text-xs font-bold transition shadow-md">Share on Telegram</button>
             </div>
         </div>
 
         <!-- 5. PROFILE TAB -->
         <div id="view-profile" class="tab-content space-y-4">
-            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl flex items-center gap-3">
-                <div class="w-12 h-12 rounded-full bg-amber-500 flex items-center justify-center font-bold text-gray-950 text-xl">أ</div>
+            <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center gap-3 shadow-lg">
+                <div class="w-12 h-12 rounded-full bg-amber-500 flex items-center justify-center font-bold text-slate-950 text-xl shadow-md">أ</div>
                 <div>
                     <h3 class="font-bold text-sm">أبو تميم</h3>
-                    <p class="text-xs text-gray-400">ID: 6773951150</p>
+                    <p class="text-xs text-slate-400 font-mono">ID: 6773951150</p>
                 </div>
             </div>
 
-            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl space-y-2">
+            <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3 shadow-lg">
                 <div class="flex justify-between text-sm">
-                    <span class="text-gray-400">Total Assets:</span>
-                    <span class="font-bold" id="profile-total">248.69 PTC</span>
+                    <span class="text-slate-400">Total Assets:</span>
+                    <span class="font-bold text-amber-400" id="profile-total">0.00 TOM</span>
                 </div>
                 <div class="flex justify-between text-sm">
-                    <span class="text-gray-400">Mining Wallet:</span>
-                    <span class="font-bold">248.69 PTC</span>
+                    <span class="text-slate-400">Current Level:</span>
+                    <span class="font-bold text-cyan-400" id="profile-level">Level 1</span>
                 </div>
             </div>
         </div>
@@ -135,76 +137,208 @@
     </div>
 
     <!-- Bottom Navigation Bar -->
-    <div class="fixed bottom-0 left-0 right-0 bg-gray-950/90 backdrop-blur border-t border-gray-800 flex justify-around py-3 max-w-md mx-auto z-50 text-xs">
-        <button onclick="switchTab('mine')" class="nav-btn text-blue-400 flex flex-col items-center gap-1" data-target="mine">
+    <div class="fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-lg border-t border-slate-800 flex justify-around py-3 max-w-md mx-auto z-50 text-xs shadow-2xl">
+        <button onclick="switchTab('mine')" class="nav-btn text-blue-400 flex flex-col items-center gap-1 transition" data-target="mine">
             <i class="fa-solid fa-hammer text-lg"></i> Mine
         </button>
-        <button onclick="switchTab('quests')" class="nav-btn text-gray-400 flex flex-col items-center gap-1" data-target="quests">
+        <button onclick="switchTab('quests')" class="nav-btn text-slate-400 hover:text-slate-200 flex flex-col items-center gap-1 transition" data-target="quests">
             <i class="fa-solid fa-star text-lg"></i> Quests
         </button>
-        <button onclick="switchTab('boost')" class="nav-btn text-gray-400 flex flex-col items-center gap-1" data-target="boost">
+        <button onclick="switchTab('boost')" class="nav-btn text-slate-400 hover:text-slate-200 flex flex-col items-center gap-1 transition" data-target="boost">
             <i class="fa-solid fa-bolt text-lg"></i> Boost
         </button>
-        <button onclick="switchTab('friends')" class="nav-btn text-gray-400 flex flex-col items-center gap-1" data-target="friends">
+        <button onclick="switchTab('friends')" class="nav-btn text-slate-400 hover:text-slate-200 flex flex-col items-center gap-1 transition" data-target="friends">
             <i class="fa-solid fa-users text-lg"></i> Friends
         </button>
-        <button onclick="switchTab('profile')" class="nav-btn text-gray-400 flex flex-col items-center gap-1" data-target="profile">
+        <button onclick="switchTab('profile')" class="nav-btn text-slate-400 hover:text-slate-200 flex flex-col items-center gap-1 transition" data-target="profile">
             <i class="fa-solid fa-gear text-lg"></i> Profile
         </button>
     </div>
 
     <script>
-        // Tab Switching Logic
+        // Tab Navigation
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById('view-' + tabName).classList.add('active');
             
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('text-blue-400');
-                btn.classList.add('text-gray-400');
+                btn.classList.add('text-slate-400');
                 if(btn.dataset.target === tabName) {
-                    btn.classList.remove('text-gray-400');
+                    btn.classList.remove('text-slate-400');
                     btn.classList.add('text-blue-400');
                 }
             });
         }
 
-        // AdsGram Integration
-        const adController = window.Adsgram.init({ blockId: "46651" });
+        // State Management
+        let walletBalance = parseFloat(localStorage.getItem('tom_balance') || '0.00');
+        let minedCounter = parseFloat(localStorage.getItem('tom_mined') || '0.0000');
+        let currentLevel = parseInt(localStorage.getItem('tom_level') || '1');
+
+        // Calculate Mining Rate based on level
+        // Base rate: 0.01 TH/s, increases by 0.005 TH/s per level
+        function getMiningRate(lvl) {
+            return 0.01 + (lvl - 1) * 0.005;
+        }
+
+        // Calculate Level Upgrade Cost (Level 2 = 10 TOM, doubles each level)
+        function getLevelCost(lvl) {
+            if (lvl <= 1) return 0;
+            if (lvl === 2) return 10;
+            return 10 * Math.pow(2, lvl - 2);
+        }
+
+        // Live Mining Ticker Loop (Runs every second)
+        setInterval(() => {
+            let rate = getMiningRate(currentLevel);
+            // Increment mined counter proportionally per second based on mining rate
+            let increment = rate * 0.1; 
+            minedCounter += increment;
+            document.getElementById('mined-counter').innerText = minedCounter.toFixed(4);
+            localStorage.setItem('tom_mined', minedCounter);
+        }, 1000);
+
+        // Claim Mined Coins
+        function claimRewards() {
+            if (minedCounter <= 0.0001) {
+                alert('لا توجد أرباح كافية للجمع حالياً!');
+                return;
+            }
+            walletBalance += minedCounter;
+            minedCounter = 0.0000;
+            localStorage.setItem('tom_balance', walletBalance);
+            localStorage.setItem('tom_mined', minedCounter);
+            updateDisplays();
+            renderLevels();
+            alert('تم جمع أرباح التعدين وإضافتها إلى رصيدك بنجاح!');
+        }
+
+        // Claim Quests
+        function claimQuest(amount, msg) {
+            walletBalance += amount;
+            localStorage.setItem('tom_balance', walletBalance);
+            updateDisplays();
+            renderLevels();
+            alert(msg);
+        }
+
+        // Upgrade Level Logic
+        function upgradeLevel(targetLevel) {
+            let cost = getLevelCost(targetLevel);
+            if (walletBalance >= cost) {
+                walletBalance -= cost;
+                currentLevel = targetLevel;
+                localStorage.setItem('tom_balance', walletBalance);
+                localStorage.setItem('tom_level', currentLevel);
+                updateDisplays();
+                renderLevels();
+                alert(`مبروك! تم ترقية التعدين إلى المستوى ${currentLevel} بنجاح.`);
+            } else {
+                alert(`رصيدك غير كافٍ! تحتاج إلى ${cost} TOM لفتح هذا المستوى.`);
+            }
+        }
+
+        // Render 1 to 50 Levels in Boost Tab
+        function renderLevels() {
+            let container = document.getElementById('levels-container');
+            container.innerHTML = '';
+
+            for (let i = 1; i <= 50; i++) {
+                let rate = getMiningRate(i);
+                let cost = getLevelCost(i);
+                let isCurrent = (i === currentLevel);
+                let isUnlocked = (i <= currentLevel);
+                let canAfford = (walletBalance >= cost);
+
+                let statusBadge = '';
+                let btnHTML = '';
+
+                if (isCurrent) {
+                    statusBadge = `<span class="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">CURRENT ACTIVE</span>`;
+                    btnHTML = `<div class="py-1.5 px-3 bg-emerald-500/20 text-emerald-400 text-xs rounded-xl font-bold text-center">Active</div>`;
+                } else if (isUnlocked) {
+                    statusBadge = `<span class="text-xs text-cyan-400 font-bold bg-cyan-500/10 px-2.5 py-1 rounded-lg border border-cyan-500/20">UNLOCKED</span>`;
+                    btnHTML = `<button onclick="currentLevel=${i}; localStorage.setItem('tom_level', currentLevel); updateDisplays(); renderLevels();" class="py-1.5 px-3 bg-slate-800 hover:bg-slate-700 text-cyan-300 text-xs rounded-xl font-bold transition">Select</button>`;
+                } else if (i === currentLevel + 1) {
+                    statusBadge = `<span class="text-xs text-amber-400 font-bold bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/20">${cost} TOM</span>`;
+                    btnHTML = `<button onclick="upgradeLevel(${i})" class="py-1.5 px-3 ${canAfford ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-900/30' : 'bg-slate-800 text-slate-500 cursor-not-allowed'} text-xs rounded-xl font-bold transition">Unlock</button>`;
+                } else {
+                    statusBadge = `<span class="text-xs text-slate-500 font-bold bg-slate-800/50 px-2.5 py-1 rounded-lg">${cost} TOM</span>`;
+                    btnHTML = `<button disabled class="py-1.5 px-3 bg-slate-900 text-slate-600 text-xs rounded-xl font-bold cursor-not-allowed">Locked</button>`;
+                }
+
+                let cardClass = isCurrent ? 'border-emerald-500/50 bg-slate-900/90' : (isUnlocked ? 'border-cyan-500/30 bg-slate-900/60' : 'border-slate-800/80 bg-slate-950/40 opacity-70');
+
+                let html = `
+                    <div class="border ${cardClass} p-3.5 rounded-2xl flex items-center justify-between shadow-md transition">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-bold text-sm text-white">Level ${i}</h3>
+                                ${statusBadge}
+                            </div>
+                            <p class="text-xs text-slate-400 mt-1">Mining Rate: <span class="text-amber-400 font-mono">${rate.toFixed(4)} TH/s</span></p>
+                        </div>
+                        <div>${btnHTML}</div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            }
+        }
+
+        // AdsGram Integration with Fallback
+        let adController = null;
+        try {
+            if (window.Adsgram) {
+                adController = window.Adsgram.init({ blockId: "46651" });
+            }
+        } catch(e) {
+            console.log("Ads loading fallback active");
+        }
 
         function showAd() {
-            adController.show().then((result) => {
-                // User watched the ad successfully
-                let currentBalance = parseFloat(localStorage.getItem('ptc_balance') || '248.69');
-                currentBalance += 5.0; // reward 5 PTC
-                localStorage.setItem('ptc_balance', currentBalance);
-                updateBalanceDisplay(currentBalance);
-                alert('مبروك! تم منحك المكافأة بنجاح.');
-            }).catch((result) => {
-                // User closed ad or error occurred
-                alert('لم يتم إكمال مشاهدة الإعلان.');
-            });
+            if (adController) {
+                adController.show().then(() => {
+                    walletBalance += 5.0; // Reward for watching ad
+                    localStorage.setItem('tom_balance', walletBalance);
+                    updateDisplays();
+                    renderLevels();
+                    alert('مبروك! تم منحك مكافأة الإعلان (+5 TOM) بنجاح.');
+                }).catch(() => {
+                    walletBalance += 5.0; // Fallback reward for testing
+                    localStorage.setItem('tom_balance', walletBalance);
+                    updateDisplays();
+                    renderLevels();
+                    alert('تم احتساب المكافأة التجريبية بنجاح (الإعلان غير مكتمل أو قيد المراجعة).');
+                });
+            } else {
+                walletBalance += 5.0;
+                localStorage.setItem('tom_balance', walletBalance);
+                updateDisplays();
+                renderLevels();
+                alert('نظام الإعلانات غير متاح مؤقتاً، وتم إضافة رصيد مكافأة تجريبي (+5 TOM)!');
+            }
         }
 
-        function claimRewards() {
-            let currentBalance = parseFloat(localStorage.getItem('ptc_balance') || '248.69');
-            currentBalance += 1.5;
-            localStorage.setItem('ptc_balance', currentBalance);
-            updateBalanceDisplay(currentBalance);
-            alert('تم جمع أرباح التعدين بنجاح!');
-        }
+        // Update UI displays
+        function updateDisplays() {
+            document.getElementById('wallet-balance').innerText = walletBalance.toFixed(2);
+            document.getElementById('profile-total').innerText = walletBalance.toFixed(2) + ' TOM';
+            document.getElementById('profile-level').innerText = `Level ${currentLevel}`;
+            document.getElementById('top-level-badge').innerText = `${currentLevel} 💎`;
+            
+            let currentRate = getMiningRate(currentLevel);
+            document.getElementById('top-mining-rate').innerText = currentRate.toFixed(4) + ' TH/s';
 
-        function updateBalanceDisplay(val) {
-            document.getElementById('wallet-balance').innerText = val.toFixed(2);
-            document.getElementById('profile-total').innerText = val.toFixed(2) + ' PTC';
-            let usd = (val * 0.00145).toFixed(2);
+            let usd = (walletBalance * 0.00145).toFixed(2);
             document.getElementById('usd-value').innerText = `(~$${usd} USD)`;
         }
 
-        // Initialize local balance on load
+        // Initialize on load
         window.onload = function() {
-            let saved = localStorage.getItem('ptc_balance');
-            if(saved) updateBalanceDisplay(parseFloat(saved));
+            updateDisplays();
+            renderLevels();
+            document.getElementById('mined-counter').innerText = minedCounter.toFixed(4);
         };
     </script>
 </body>
