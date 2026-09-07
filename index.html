@@ -23,7 +23,7 @@
     <!-- Top Bar -->
     <div class="flex justify-between items-center p-3.5 bg-slate-900/95 border-b border-slate-800 text-xs backdrop-blur-md sticky top-0 z-40 shadow-md">
         <div>المفرخة: <span class="text-emerald-400 font-extrabold" id="top-hatch-capacity">سعة 130 بيضة</span></div>
-        <div class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 font-mono">PRO FARM v4.0</div>
+        <div class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 font-mono">PRO FARM v4.2</div>
         <div>المستوى: <span class="text-amber-400 font-extrabold" id="top-level-badge">1 🐣</span></div>
     </div>
 
@@ -49,18 +49,24 @@
                 </div>
             </div>
 
+            <!-- Offline Banner Status -->
+            <div id="offline-status-banner" class="hidden bg-emerald-950/80 border border-emerald-500/30 p-2.5 rounded-xl text-xs text-emerald-300 flex justify-between items-center">
+                <span><i class="fa-solid fa-moon ml-1"></i> إنتاج الخلفية إثناء غيابك:</span>
+                <span id="offline-produced-count" class="font-bold font-mono text-amber-300">+0.00 بيضة</span>
+            </div>
+
             <!-- Stage 1: Mother Hens & Eggs Collection -->
             <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl shadow-lg relative overflow-hidden">
-                <div class="flex justify-between items-center mb-2">
+                <div class="flex justify-between items-center mb-1">
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-feather text-amber-400"></i>
                         <h3 class="font-bold text-sm">قطعان أمهات البياض</h3>
                     </div>
                     <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20 font-bold">4 دجاجات + ديك</span>
                 </div>
-                <p class="text-xs text-slate-400 mb-3">تقوم الأمهات بإنتاج البيض المستمر للتشغيل.</p>
+                <p class="text-[11px] text-slate-400 mb-3">حد الإنتاج المستمر في الغياب: <span class="text-amber-300 font-bold">3 ساعات أقصى حد</span></p>
                 
-                <div class="flex justify-between items-center bg-slate-950 p-3 rounded-xl border border-slate-800 mb-3">
+                <div class="flex justify-between items-center bg-slate-950 p-3 rounded-xl border border-slate-800 mb-1">
                     <div>
                         <div class="text-[11px] text-slate-400">البيض المجمع جاهز:</div>
                         <div class="text-lg font-black text-amber-300 font-mono" id="egg-stock">0.00 بيضة</div>
@@ -71,26 +77,30 @@
                 </div>
             </div>
 
-            <!-- Stage 2: Incubator & Hatching -->
+            <!-- Stage 2: Incubator & Hatching (مشروطة بإعلان) -->
             <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl shadow-lg">
-                <div class="flex justify-between items-center mb-2">
+                <div class="flex justify-between items-center mb-1">
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-temperature-high text-red-400"></i>
                         <h3 class="font-bold text-sm">عنابر التفقيس (الفقاسة الآلية)</h3>
                     </div>
-                    <span class="text-[10px] bg-red-500/10 text-red-400 px-2 py-0.5 rounded border border-red-500/20 font-bold">حرارة مثالية</span>
+                    <span class="text-[10px] bg-red-500/10 text-red-400 px-2 py-0.5 rounded border border-red-500/20 font-bold">تأكيد بالإعلان</span>
                 </div>
-                <p class="text-xs text-slate-400 mb-3">ضخ البيض داخل المفرخة لبدء دورة التفقيس.</p>
+                <p class="text-[11px] text-slate-400 mb-3">تفقيس واستخراج الكتاكيت يتطلب مشاهدة إعلان لتشغيل المفرخة.</p>
 
                 <div class="flex justify-between items-center bg-slate-950 p-3 rounded-xl border border-slate-800 mb-3">
                     <div>
                         <div class="text-[11px] text-slate-400">بيض قيد الحضانة:</div>
                         <div class="text-lg font-black text-red-300 font-mono" id="incubator-stock">0.00 بيضة</div>
                     </div>
-                    <button onclick="startIncubation()" class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white font-bold rounded-xl text-xs transition shadow-md active:scale-95">
-                        <i class="fa-solid fa-fire-flame-curved ml-1"></i> إدخال للمفرخة
+                    <button onclick="transferToIncubator()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition border border-slate-700">
+                        <i class="fa-solid fa-arrow-down-long ml-1"></i> نقل للفقاسة
                     </button>
                 </div>
+
+                <button onclick="hatchChicksWithAd()" class="w-full py-3 bg-gradient-to-r from-red-600 to-rose-500 hover:from-red-500 hover:to-rose-400 text-white font-black rounded-xl text-xs transition shadow-md flex items-center justify-center gap-2 active:scale-95">
+                    <i class="fa-solid fa-play"></i> تفقيس واستخراج الكتاكيت (مشاهدة إعلان)
+                </button>
             </div>
 
             <!-- Stage 3 & 4: Chick Extraction & Sales Pens -->
@@ -116,12 +126,12 @@
             </div>
 
             <!-- Booster Ad Button -->
-            <button onclick="showAd()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black rounded-2xl shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2 active:scale-95 text-sm">
-                <i class="fa-solid fa-play"></i> دعم طاقة المفرخة (+5 أطقم علف مجاني)
+            <button onclick="showRewardAd()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black rounded-2xl shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2 active:scale-95 text-sm">
+                <i class="fa-solid fa-circle-dollar-to-slot"></i> مشاهدة إعلان (+10 TOM مكافأة)
             </button>
         </div>
 
-        <!-- 2. PENS & LEVELS TAB (ترقية خطوط الإنتاج والمستويات الـ 50) -->
+        <!-- 2. PENS & LEVELS TAB -->
         <div id="view-boost" class="tab-content space-y-3">
             <div class="flex justify-between items-center mb-2">
                 <div>
@@ -140,7 +150,7 @@
             <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between shadow-md">
                 <div>
                     <h4 class="font-bold text-sm">فحص معدات التفقيس اليومي</h4>
-                    <p class="text-xs text-amber-400 font-bold" id="daily-status">+10 أطقم تشغيل</p>
+                    <p class="text-xs text-amber-400 font-bold" id="daily-status">+10 TOM مكافأة</p>
                 </div>
                 <button id="daily-btn" onclick="claimDailyCheckin()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-xs font-bold transition">استلام</button>
             </div>
@@ -248,7 +258,7 @@
         let currentLevel = parseInt(localStorage.getItem('tom_level') || '1');
 
         function getProductionRate(lvl) {
-            return 0.05 + (lvl - 1) * 0.02; // إنتاج البيض التلقائي حسب الأطقم (4 دجاجات وديك)
+            return 0.05 + (lvl - 1) * 0.02; // معدل إنتاج البيض
         }
 
         function getLevelCost(lvl) {
@@ -257,19 +267,66 @@
             return 15 * Math.pow(2, lvl - 2);
         }
 
-        // Background Production Loop (الأمهات تنتج البيض بمرور الوقت)
-        setInterval(() => {
-            let rate = getProductionRate(currentLevel);
-            let increment = (rate / 5) * 0.2; 
-            eggStock += increment;
-            document.getElementById('egg-stock').innerText = eggStock.toFixed(2) + " بيضة";
-            localStorage.setItem('tom_eggs', eggStock);
-        }, 300);
+        // -------------------------------------------------------------
+        // 1. حساب الإنتاج في الخلفية (Offline Production - 3 Hours Limit)
+        // -------------------------------------------------------------
+        function calculateOfflineProduction() {
+            let now = Date.now();
+            let lastSave = parseInt(localStorage.getItem('tom_last_time') || now);
+            let elapsedSeconds = (now - lastSave) / 1000;
+            let maxOfflineSeconds = 3 * 3600; // 3 ساعات = 10800 ثانية
 
-        // Stage 1 to 2: Collect Eggs to Incubator
+            if (elapsedSeconds > 5) {
+                let effectiveSeconds = Math.min(elapsedSeconds, maxOfflineSeconds);
+                let ratePerSec = (getProductionRate(currentLevel) / 5) * 3.33; 
+                let offlineEggs = ratePerSec * effectiveSeconds;
+
+                if (offlineEggs > 0) {
+                    eggStock += offlineEggs;
+                    localStorage.setItem('tom_eggs', eggStock);
+                    
+                    let banner = document.getElementById('offline-status-banner');
+                    let countSpan = document.getElementById('offline-produced-count');
+                    banner.classList.remove('hidden');
+                    countSpan.innerText = `+${offlineEggs.toFixed(2)} بيضة`;
+                }
+            }
+            localStorage.setItem('tom_last_time', now);
+        }
+
+        // Live Production Loop
+        setInterval(() => {
+            let now = Date.now();
+            let lastSave = parseInt(localStorage.getItem('tom_last_time') || now);
+            let elapsedSeconds = (now - lastSave) / 1000;
+
+            // يتوقف العداد التلقائي إذا تجاوزت مدة عدم التفاعل 3 ساعات
+            if (elapsedSeconds < 3 * 3600) {
+                let ratePerSec = (getProductionRate(currentLevel) / 5) * 3.33;
+                eggStock += ratePerSec * 0.5; // كل نصف ثانية
+                document.getElementById('egg-stock').innerText = eggStock.toFixed(2) + " بيضة";
+                localStorage.setItem('tom_eggs', eggStock);
+            }
+            localStorage.setItem('tom_last_time', now);
+        }, 500);
+
+        // Stage 1: Collect Eggs
         function collectEggs() {
             if (eggStock < 1) {
                 alert('انتظر قليلاً حتى تنتج الأمهات بيضاً كافياً للجمع!');
+                return;
+            }
+            let collected = eggStock;
+            eggStock = 0.00;
+            localStorage.setItem('tom_eggs', eggStock);
+            updateDisplays();
+            alert(`تم جمع ${collected.toFixed(2)} بيضة بنجاح!`);
+        }
+
+        // Stage 2: Transfer to Incubator
+        function transferToIncubator() {
+            if (eggStock < 1) {
+                alert('لا يوجد بيض جاهز للجمع والتحويل إلى الفقاسة!');
                 return;
             }
             incubatorStock += eggStock;
@@ -277,21 +334,33 @@
             localStorage.setItem('tom_eggs', eggStock);
             localStorage.setItem('tom_incubator', incubatorStock);
             updateDisplays();
-            alert('تم جمع البيض بنجاح وإدخاله إلى الفقاسة الآلية!');
+            alert('تم نقل البيض بنجاح داخل الفقاسة الآلية!');
         }
 
-        // Stage 2 to 3: Incubator to Chicks
-        function startIncubation() {
+        // -------------------------------------------------------------
+        // 2. تفقيس الكتاكيت مشروط بمشاهدة الإعلان
+        // -------------------------------------------------------------
+        function hatchChicksWithAd() {
             if (incubatorStock < 1) {
-                alert('لا يوجد بيض في الفقاسة! اجمع البيض أولاً.');
+                alert('الفقاسة خالية! قم بنقل البيض للفقاسة أولاً لتتمكن من تفقيسه.');
                 return;
             }
-            chickStock += incubatorStock * 0.95; // نسبة نجاح التفقيس 95%
-            incubatorStock = 0.00;
-            localStorage.setItem('tom_incubator', incubatorStock);
-            localStorage.setItem('tom_chicks', chickStock);
-            updateDisplays();
-            alert('تمت عملية التفقيس بنجاح وتم تحويل الكتاكيت لعنابر الفرز!');
+
+            if (adController) {
+                adController.show().then(() => {
+                    let hatched = incubatorStock * 0.95; // نسبة التفقيس 95%
+                    chickStock += hatched;
+                    incubatorStock = 0.00;
+                    localStorage.setItem('tom_incubator', incubatorStock);
+                    localStorage.setItem('tom_chicks', chickStock);
+                    updateDisplays();
+                    alert(`تهانينا! أتممت الإعلان وتم تفقيس واستخراج ${hatched.toFixed(2)} كتكوت بنجاح!`);
+                }).catch((err) => {
+                    alert('يلزم مشاهدة الإعلان بالكامل لتشغيل المفرخة واستخراج الكتاكيت!');
+                });
+            } else {
+                alert('جاري اتصال نظام الإعلانات، يرجى إعادة المحاولة خلال لحظات.');
+            }
         }
 
         // Stage 4: Sell Chicks for Balance
@@ -300,7 +369,7 @@
                 alert('عنابر العرض خالية من الكتاكيت حالياً!');
                 return;
             }
-            let earned = chickStock * 1.5; // سعر البيع لكل كتكوت
+            let earned = chickStock * 1.5;
             walletBalance += earned;
             chickStock = 0.00;
             localStorage.setItem('tom_balance', walletBalance);
@@ -401,6 +470,7 @@
             }
         }
 
+        // Adsgram Integration Setup
         let adController = null;
         try {
             if (window.Adsgram) {
@@ -408,24 +478,18 @@
             }
         } catch(e) {}
 
-        function showAd() {
+        function showRewardAd() {
             if (adController) {
                 adController.show().then(() => {
                     walletBalance += 10.0;
                     localStorage.setItem('tom_balance', walletBalance);
                     updateDisplays();
-                    alert('تم منحك مكافأة دعم المفرخة (+10 TOM)!');
-                }).catch(() => {
-                    walletBalance += 10.0;
-                    localStorage.setItem('tom_balance', walletBalance);
-                    updateDisplays();
-                    alert('تم إضافة رصيد دعم المفرخة (+10 TOM)!');
+                    alert('تم منحك مكافأة مشاهدة الإعلان (+10 TOM)!');
+                }).catch((err) => {
+                    alert('تعذر تشغيل الإعلان حالياً.');
                 });
             } else {
-                walletBalance += 10.0;
-                localStorage.setItem('tom_balance', walletBalance);
-                updateDisplays();
-                alert('تم إضافة رصيد دعم المفرخة بنجاح (+10 TOM)!');
+                alert('جاري إعداد نظام الإعلانات، يرجى المحاولة لاحقاً.');
             }
         }
 
@@ -444,6 +508,7 @@
         }
 
         window.onload = function() {
+            calculateOfflineProduction();
             updateDisplays();
             renderLevels();
             checkDailyStatus();
