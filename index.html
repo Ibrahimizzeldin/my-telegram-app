@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body { background-color: #020617; color: #f8fafc; font-family: Tahoma, sans-serif; }
@@ -33,7 +32,6 @@
 
         <!-- 1. MINE TAB -->
         <div id="view-mine" class="tab-content active text-center">
-            <!-- Wallet Badge -->
             <div class="inline-flex items-center gap-2 bg-slate-900 border border-slate-800 px-5 py-2.5 rounded-full my-3 shadow-xl">
                 <i class="fa-solid fa-wallet text-amber-500"></i>
                 <span class="font-black text-lg tracking-wide" id="wallet-balance">0.00</span> 
@@ -41,7 +39,6 @@
                 <span class="text-xs text-emerald-400 ml-2" id="usd-value">(~$0.00 USD)</span>
             </div>
 
-            <!-- Coin Graphic with Live Animation -->
             <div class="relative w-44 h-44 mx-auto my-5 rounded-full bg-gradient-to-tr from-amber-600 via-yellow-500 to-yellow-200 p-1.5 glow-coin flex items-center justify-center animate-pulse">
                 <div class="w-full h-full rounded-full bg-slate-950 flex flex-col items-center justify-center border-4 border-amber-500/40">
                     <i class="fa-solid fa-coins text-amber-400 text-5xl mb-2"></i>
@@ -49,12 +46,10 @@
                 </div>
             </div>
 
-            <!-- Live Ticker Counter -->
             <div class="text-xs text-slate-400 font-medium mb-1">عداد التعدين الحي المباشر</div>
             <div class="text-5xl font-black my-2 text-white tracking-wider font-mono drop-shadow-[0_10px_15px_rgba(0,0,0,0.9)]" id="mined-counter">0.0000</div>
             <div class="text-xs text-amber-400 font-bold mb-4">TOM</div>
 
-            <!-- Action Buttons -->
             <div class="space-y-3 mt-4">
                 <button onclick="claimRewards()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 font-bold rounded-2xl shadow-lg shadow-blue-900/40 transition active:scale-95 text-lg border border-blue-400/30 flex items-center justify-center gap-2">
                     <i class="fa-solid fa-hand-holding-dollar"></i> Claim Mined TOM
@@ -70,7 +65,6 @@
             <h2 class="text-lg font-bold mb-1">Earn Rewards</h2>
             <p class="text-xs text-slate-400 mb-4">Complete quests and earn TOM directly into your wallet</p>
             
-            <!-- Daily Check-in -->
             <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between shadow-md">
                 <div>
                     <h4 class="font-bold text-sm">Daily Check-in</h4>
@@ -80,7 +74,7 @@
             </div>
         </div>
 
-        <!-- 3. BOOST & LEVELS TAB (1 to 50 with Frozen/Locked Past Levels) -->
+        <!-- 3. BOOST & LEVELS TAB -->
         <div id="view-boost" class="tab-content space-y-3">
             <div class="flex justify-between items-center mb-2">
                 <div>
@@ -88,11 +82,7 @@
                     <p class="text-xs text-slate-400">Upgrade levels forward permanently (Past levels are frozen)</p>
                 </div>
             </div>
-
-            <!-- Dynamic Levels Container -->
-            <div id="levels-container" class="space-y-2.5 max-h-[65vh] overflow-y-auto pr-1">
-                <!-- Javascript populates levels 1 to 50 -->
-            </div>
+            <div id="levels-container" class="space-y-2.5 max-h-[65vh] overflow-y-auto pr-1"></div>
         </div>
 
         <!-- 4. FRIENDS TAB -->
@@ -151,7 +141,6 @@
     </div>
 
     <script>
-        // Telegram WebApp Initialization
         let tg = window.Telegram.WebApp;
         tg.expand();
 
@@ -167,8 +156,7 @@
         document.getElementById('user-id').innerText = "ID: " + userId;
         document.getElementById('user-initial').innerText = userName.charAt(0).toUpperCase();
 
-        // Referral Link Generation
-        let botUsername = "EarnTapAdssbot"; // استبدل يوزرنيم بوتك هنا إن وجد
+        let botUsername = "EarnTapAdssbot";
         let refLink = `https://t.me/${botUsername}/app?start=ref_${userId}`;
         document.getElementById('ref-link').innerText = refLink;
 
@@ -177,7 +165,6 @@
             alert('تم نسخ رابط الإحالة الخاص بك بنجاح!');
         }
 
-        // Tab Navigation
         function switchTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById('view-' + tabName).classList.add('active');
@@ -192,24 +179,20 @@
             });
         }
 
-        // State Management
         let walletBalance = parseFloat(localStorage.getItem('tom_balance') || '0.00');
         let minedCounter = parseFloat(localStorage.getItem('tom_mined') || '0.0000');
         let currentLevel = parseInt(localStorage.getItem('tom_level') || '1');
 
-        // Mining Rate per level
         function getMiningRate(lvl) {
             return 0.01 + (lvl - 1) * 0.005;
         }
 
-        // Level Cost
         function getLevelCost(lvl) {
             if (lvl <= 1) return 0;
             if (lvl === 2) return 10;
             return 10 * Math.pow(2, lvl - 2);
         }
 
-        // High-Speed Live Counter Ticker
         setInterval(() => {
             let rate = getMiningRate(currentLevel);
             let increment = (rate / 5) * 0.1; 
@@ -218,7 +201,6 @@
             localStorage.setItem('tom_mined', minedCounter);
         }, 200);
 
-        // Claim Mined Coins
         function claimRewards() {
             if (minedCounter < 0.0005) {
                 alert('انتظر قليلاً لتراكم رصيد كافٍ للجمع!');
@@ -233,7 +215,6 @@
             alert('تم جمع أرباح التعدين وإضافتها إلى رصيدك بنجاح!');
         }
 
-        // Check Daily Check-in Status
         function checkDailyStatus() {
             let lastCheckin = localStorage.getItem('tom_last_checkin');
             let today = new Date().toDateString();
@@ -249,7 +230,6 @@
             }
         }
 
-        // Claim Daily Check-in
         function claimDailyCheckin() {
             let lastCheckin = localStorage.getItem('tom_last_checkin');
             let today = new Date().toDateString();
@@ -268,12 +248,11 @@
             alert('تم استلام مكافأة تسجيل الدخول اليومي (+5 TOM) بنجاح!');
         }
 
-        // Upgrade Level Logic (Forward Only & Frozen Past Levels)
         function upgradeLevel(targetLevel) {
             let cost = getLevelCost(targetLevel);
             if (walletBalance >= cost) {
                 walletBalance -= cost;
-                currentLevel = targetLevel; // التقدم للأمام فقط وثبات المستوى الجديد
+                currentLevel = targetLevel;
                 localStorage.setItem('tom_balance', walletBalance);
                 localStorage.setItem('tom_level', currentLevel);
                 updateDisplays();
@@ -284,7 +263,6 @@
             }
         }
 
-        // Render Levels (1 to 50 with Frozen Past Levels)
         function renderLevels() {
             let container = document.getElementById('levels-container');
             container.innerHTML = '';
@@ -293,7 +271,7 @@
                 let rate = getMiningRate(i);
                 let cost = getLevelCost(i);
                 let isCurrent = (i === currentLevel);
-                let isCompleted = (i < currentLevel); // المستويات السابقة أصبحت مجمدة ومكتملة
+                let isCompleted = (i < currentLevel);
                 let isNext = (i === currentLevel + 1);
                 let canAfford = (walletBalance >= cost);
 
@@ -301,7 +279,6 @@
                 let btnHTML = '';
 
                 if (isCompleted) {
-                    // تجميد المستويات السابقة بالكامل وعدم السماح بالرجوع لها
                     statusBadge = `<span class="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">COMPLETED</span>`;
                     btnHTML = `<div class="py-1 px-3 bg-slate-800 text-slate-500 text-xs rounded-xl font-bold text-center cursor-not-allowed">Frozen</div>`;
                 } else if (isCurrent) {
@@ -333,7 +310,6 @@
             }
         }
 
-        // AdsGram Integration
         let adController = null;
         try {
             if (window.Adsgram) {
@@ -367,7 +343,6 @@
             }
         }
 
-        // Update UI displays
         function updateDisplays() {
             document.getElementById('wallet-balance').innerText = walletBalance.toFixed(2);
             document.getElementById('profile-total').innerText = walletBalance.toFixed(2) + ' TOM';
@@ -381,7 +356,6 @@
             document.getElementById('usd-value').innerText = `(~$${usd} USD)`;
         }
 
-        // Initialize on load
         window.onload = function() {
             updateDisplays();
             renderLevels();
