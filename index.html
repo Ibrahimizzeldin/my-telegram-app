@@ -3,60 +3,210 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EarnTap Ads App</title>
-    <!-- مكتبة AdsGram الرسمية -->
+    <title>EarnTap - Mining App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: Tahoma, sans-serif;
-            text-align: center;
-            background-color: #18191a;
-            color: #ffffff;
-            margin-top: 80px;
-        }
-        .container {
-            padding: 20px;
-        }
-        button {
-            background-color: #2481cc;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            border-radius: 12px;
-            cursor: pointer;
-            margin-top: 25px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-        button:active {
-            transform: scale(0.98);
-        }
+        body { background-color: #030712; color: #f3f4f6; font-family: Tahoma, sans-serif; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
     </style>
 </head>
-<body>
+<body class="min-h-screen pb-24 select-none">
 
-    <div class="container">
-        <h1>تطبيق الأرباح - EarnTap</h1>
-        <p>شاهد الإعلان واحصل على مكافأتك الفورية</p>
-        
-        <button onclick="showRewardedAd()">شاهد الإعلان واربح</button>
+    <!-- Top Bar -->
+    <div class="flex justify-between items-center p-4 bg-gray-900/50 border-b border-gray-800 text-xs">
+        <div>MINING RATE: <span class="text-yellow-400 font-bold" id="mining-rate">0.2067 TH/s</span></div>
+        <div>CURRENT RANK: <span class="text-blue-400 font-bold">Level 3 💎</span></div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="max-w-md mx-auto p-4">
+
+        <!-- 1. MINE TAB -->
+        <div id="view-mine" class="tab-content active text-center">
+            <!-- Wallet Badge -->
+            <div class="inline-flex items-center gap-2 bg-gray-900 border border-gray-800 px-4 py-2 rounded-full my-4 shadow-lg">
+                <i class="fa-solid fa-wallet text-yellow-500"></i>
+                <span class="font-bold text-lg" id="wallet-balance">248.69</span> <span class="text-sm text-gray-400">PTC</span>
+                <span class="text-xs text-green-400 ml-2" id="usd-value">(~$0.36 USD)</span>
+            </div>
+
+            <!-- Coin Graphic -->
+            <div class="relative w-48 h-48 mx-auto my-6 rounded-full bg-gradient-to-tr from-amber-600 to-yellow-300 p-1 shadow-2xl flex items-center justify-center">
+                <div class="w-full h-full rounded-full bg-gray-950 flex flex-col items-center justify-center border-4 border-yellow-500/50">
+                    <i class="fa-solid fa-coins text-yellow-400 text-5xl mb-2 animate-pulse"></i>
+                    <span class="text-xs text-yellow-200 tracking-widest font-bold">EARNTAP</span>
+                </div>
+            </div>
+
+            <!-- Counter -->
+            <div class="text-4xl font-black my-4 text-white tracking-wider" id="mined-counter">+8.4513</div>
+
+            <!-- Action Buttons -->
+            <div class="space-y-3 mt-6">
+                <button onclick="claimRewards()" class="w-full py-4 bg-blue-600 hover:bg-blue-500 font-bold rounded-2xl shadow-lg transition active:scale-95 text-lg">
+                    Claim
+                </button>
+                <button onclick="showAd()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-gray-950 font-black rounded-2xl shadow-lg transition flex items-center justify-center gap-2 active:scale-95">
+                    <i class="fa-solid fa-play"></i> Watch Ad for +0.5 TH/s Boost (+1h)
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. QUESTS TAB -->
+        <div id="view-quests" class="tab-content space-y-3">
+            <h2 class="text-lg font-bold mb-2">Earn Rewards</h2>
+            <p class="text-xs text-gray-400 mb-4">Complete quests and earn PTC directly into your wallet</p>
+            
+            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl flex items-center justify-between">
+                <div>
+                    <h4 class="font-bold text-sm">Daily Check-in</h4>
+                    <p class="text-xs text-yellow-400">+5 PTC</p>
+                </div>
+                <button onclick="alert('تم استلام مكافأة تسجيل الدخول اليومي!')" class="px-4 py-2 bg-blue-600 rounded-xl text-xs font-bold">Claim</button>
+            </div>
+
+            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl flex items-center justify-between">
+                <div>
+                    <h4 class="font-bold text-sm">Join Telegram Channel</h4>
+                    <p class="text-xs text-gray-400">Claimed</p>
+                </div>
+                <i class="fa-solid fa-check-circle text-green-500 text-xl"></i>
+            </div>
+        </div>
+
+        <!-- 3. BOOST TAB -->
+        <div id="view-boost" class="tab-content space-y-4">
+            <h2 class="text-lg font-bold">Boost Mining Speed</h2>
+            <p class="text-xs text-gray-400">Upgrade your mining gear to earn more PTC per second</p>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-gray-900 border border-green-500/50 p-3 rounded-2xl">
+                    <span class="text-xs text-green-400 font-bold">ACTIVE</span>
+                    <h3 class="font-bold mt-1">Level 3</h3>
+                    <p class="text-xs text-gray-400">+0.207 TH/s</p>
+                    <div class="mt-3 py-1.5 bg-green-500/20 text-green-400 text-center text-xs rounded-xl font-bold">Active</div>
+                </div>
+                <div class="bg-gray-900 border border-gray-800 p-3 rounded-2xl opacity-75">
+                    <span class="text-xs text-blue-400 font-bold">LOCKED</span>
+                    <h3 class="font-bold mt-1">Level 4</h3>
+                    <p class="text-xs text-gray-400">+0.210 TH/s</p>
+                    <button class="mt-3 w-full py-1.5 bg-blue-600 text-white text-xs rounded-xl font-bold">251 PTC</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. FRIENDS TAB -->
+        <div id="view-friends" class="tab-content space-y-4">
+            <h2 class="text-lg font-bold">Referral Syndicate</h2>
+            <p class="text-xs text-gray-400">Invite friends to mine together! Earn 100 PTC upfront.</p>
+            
+            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl">
+                <span class="text-xs text-gray-400">Your Invite Link</span>
+                <div class="bg-gray-950 p-2.5 rounded-xl text-xs text-blue-400 truncate mt-1 mb-3" id="ref-link">https://t.me/EarnTapAdssbot/app?start=ref_6773951150</div>
+                <button onclick="navigator.clipboard.writeText(document.getElementById('ref-link').innerText); alert('تم كوبي الرابط بنجاح!');" class="w-full py-3 bg-blue-600 rounded-xl text-xs font-bold">Share on Telegram</button>
+            </div>
+        </div>
+
+        <!-- 5. PROFILE TAB -->
+        <div id="view-profile" class="tab-content space-y-4">
+            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-amber-500 flex items-center justify-center font-bold text-gray-950 text-xl">أ</div>
+                <div>
+                    <h3 class="font-bold text-sm">أبو تميم</h3>
+                    <p class="text-xs text-gray-400">ID: 6773951150</p>
+                </div>
+            </div>
+
+            <div class="bg-gray-900 border border-gray-800 p-4 rounded-2xl space-y-2">
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-400">Total Assets:</span>
+                    <span class="font-bold" id="profile-total">248.69 PTC</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-gray-400">Mining Wallet:</span>
+                    <span class="font-bold">248.69 PTC</span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="fixed bottom-0 left-0 right-0 bg-gray-950/90 backdrop-blur border-t border-gray-800 flex justify-around py-3 max-w-md mx-auto z-50 text-xs">
+        <button onclick="switchTab('mine')" class="nav-btn text-blue-400 flex flex-col items-center gap-1" data-target="mine">
+            <i class="fa-solid fa-hammer text-lg"></i> Mine
+        </button>
+        <button onclick="switchTab('quests')" class="nav-btn text-gray-400 flex flex-col items-center gap-1" data-target="quests">
+            <i class="fa-solid fa-star text-lg"></i> Quests
+        </button>
+        <button onclick="switchTab('boost')" class="nav-btn text-gray-400 flex flex-col items-center gap-1" data-target="boost">
+            <i class="fa-solid fa-bolt text-lg"></i> Boost
+        </button>
+        <button onclick="switchTab('friends')" class="nav-btn text-gray-400 flex flex-col items-center gap-1" data-target="friends">
+            <i class="fa-solid fa-users text-lg"></i> Friends
+        </button>
+        <button onclick="switchTab('profile')" class="nav-btn text-gray-400 flex flex-col items-center gap-1" data-target="profile">
+            <i class="fa-solid fa-gear text-lg"></i> Profile
+        </button>
     </div>
 
     <script>
-        // تهيئة وحدة الإعلانات بالمعرّف الصحيح 46651
+        // Tab Switching Logic
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-' + tabName).classList.add('active');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-blue-400');
+                btn.classList.add('text-gray-400');
+                if(btn.dataset.target === tabName) {
+                    btn.classList.remove('text-gray-400');
+                    btn.classList.add('text-blue-400');
+                }
+            });
+        }
+
+        // AdsGram Integration
         const adController = window.Adsgram.init({ blockId: "46651" });
 
-        function showRewardedAd() {
-            adController.show()
-                .then((result) => {
-                    // نجاح مشاهدة الإعلان بالكامل
-                    alert("تهانينا! تم إكمال الإعلان بنجاح وتم منح المكافأة.");
-                })
-                .catch((err) => {
-                    // إغلاق الإعلان قبل اكتماله أو حدوث خطأ
-                    alert("لم يتم إكمال مشاهدة الإعلان.");
-                });
+        function showAd() {
+            adController.show().then((result) => {
+                // User watched the ad successfully
+                let currentBalance = parseFloat(localStorage.getItem('ptc_balance') || '248.69');
+                currentBalance += 5.0; // reward 5 PTC
+                localStorage.setItem('ptc_balance', currentBalance);
+                updateBalanceDisplay(currentBalance);
+                alert('مبروك! تم منحك المكافأة بنجاح.');
+            }).catch((result) => {
+                // User closed ad or error occurred
+                alert('لم يتم إكمال مشاهدة الإعلان.');
+            });
         }
+
+        function claimRewards() {
+            let currentBalance = parseFloat(localStorage.getItem('ptc_balance') || '248.69');
+            currentBalance += 1.5;
+            localStorage.setItem('ptc_balance', currentBalance);
+            updateBalanceDisplay(currentBalance);
+            alert('تم جمع أرباح التعدين بنجاح!');
+        }
+
+        function updateBalanceDisplay(val) {
+            document.getElementById('wallet-balance').innerText = val.toFixed(2);
+            document.getElementById('profile-total').innerText = val.toFixed(2) + ' PTC';
+            let usd = (val * 0.00145).toFixed(2);
+            document.getElementById('usd-value').innerText = `(~$${usd} USD)`;
+        }
+
+        // Initialize local balance on load
+        window.onload = function() {
+            let saved = localStorage.getItem('ptc_balance');
+            if(saved) updateBalanceDisplay(parseFloat(saved));
+        };
     </script>
 </body>
-</html>
+    </html>
+    
