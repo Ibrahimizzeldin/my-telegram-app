@@ -23,7 +23,7 @@
     <!-- Top Bar -->
     <div class="flex justify-between items-center p-3.5 bg-slate-900/95 border-b border-slate-800 text-xs backdrop-blur-md sticky top-0 z-40 shadow-md">
         <div>المفرخة: <span class="text-emerald-400 font-extrabold" id="top-hatch-capacity">سعة 130 بيضة</span></div>
-        <div class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 font-mono">PRO FARM v4.2</div>
+        <div class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 font-mono">PRO FARM v4.5</div>
         <div>المستوى: <span class="text-amber-400 font-extrabold" id="top-level-badge">1 🐣</span></div>
     </div>
 
@@ -51,7 +51,7 @@
 
             <!-- Offline Banner Status -->
             <div id="offline-status-banner" class="hidden bg-emerald-950/80 border border-emerald-500/30 p-2.5 rounded-xl text-xs text-emerald-300 flex justify-between items-center">
-                <span><i class="fa-solid fa-moon ml-1"></i> إنتاج الخلفية إثناء غيابك:</span>
+                <span><i class="fa-solid fa-moon ml-1"></i> إنتاج الخلفية أثناء غيابك:</span>
                 <span id="offline-produced-count" class="font-bold font-mono text-amber-300">+0.00 بيضة</span>
             </div>
 
@@ -77,20 +77,19 @@
                 </div>
             </div>
 
-            <!-- Stage 2: Incubator & Hatching (مشروطة بإعلان) -->
-            <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl shadow-lg">
-                <div class="flex justify-between items-center mb-1">
+            <!-- Stage 2: Incubator & Hatching (خياران للتفقيس) -->
+            <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl shadow-lg space-y-3">
+                <div class="flex justify-between items-center">
                     <div class="flex items-center gap-2">
                         <i class="fa-solid fa-temperature-high text-red-400"></i>
                         <h3 class="font-bold text-sm">عنابر التفقيس (الفقاسة الآلية)</h3>
                     </div>
-                    <span class="text-[10px] bg-red-500/10 text-red-400 px-2 py-0.5 rounded border border-red-500/20 font-bold">تأكيد بالإعلان</span>
+                    <span class="text-[10px] bg-red-500/10 text-red-400 px-2 py-0.5 rounded border border-red-500/20 font-bold">خيارات التفقيس</span>
                 </div>
-                <p class="text-[11px] text-slate-400 mb-3">تفقيس واستخراج الكتاكيت يتطلب مشاهدة إعلان لتشغيل المفرخة.</p>
 
-                <div class="flex justify-between items-center bg-slate-950 p-3 rounded-xl border border-slate-800 mb-3">
+                <div class="flex justify-between items-center bg-slate-950 p-3 rounded-xl border border-slate-800">
                     <div>
-                        <div class="text-[11px] text-slate-400">بيض قيد الحضانة:</div>
+                        <div class="text-[11px] text-slate-400">بيض داخل الفقاسة:</div>
                         <div class="text-lg font-black text-red-300 font-mono" id="incubator-stock">0.00 بيضة</div>
                     </div>
                     <button onclick="transferToIncubator()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition border border-slate-700">
@@ -98,9 +97,24 @@
                     </button>
                 </div>
 
-                <button onclick="hatchChicksWithAd()" class="w-full py-3 bg-gradient-to-r from-red-600 to-rose-500 hover:from-red-500 hover:to-rose-400 text-white font-black rounded-xl text-xs transition shadow-md flex items-center justify-center gap-2 active:scale-95">
-                    <i class="fa-solid fa-play"></i> تفقيس واستخراج الكتاكيت (مشاهدة إعلان)
-                </button>
+                <!-- Hatching Options Box -->
+                <div class="grid grid-cols-1 gap-2 pt-1">
+                    <!-- Option 1: Instant Ad Hatch -->
+                    <button onclick="hatchChicksInstantAd()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black rounded-xl text-xs transition shadow-md flex items-center justify-center gap-2 active:scale-95">
+                        <i class="fa-solid fa-bolt text-sm"></i> ⚡ تفقيس فوري (مشاهدة إعلان)
+                    </button>
+
+                    <!-- Option 2: 5-Minute Timer Hatch -->
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col gap-2">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-400">تفقيس عادي بالتايمر:</span>
+                            <span id="timer-status-badge" class="font-mono font-bold text-slate-400">05:00</span>
+                        </div>
+                        <button id="timer-hatch-btn" onclick="handleTimerIncubation()" class="w-full py-2.5 bg-red-600 hover:bg-red-500 text-white font-bold rounded-lg text-xs transition shadow-md flex items-center justify-center gap-2 active:scale-95">
+                            <i class="fa-solid fa-stopwatch"></i> تشغيل الفقاسة (5 دقائق)
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- Stage 3 & 4: Chick Extraction & Sales Pens -->
@@ -126,7 +140,7 @@
             </div>
 
             <!-- Booster Ad Button -->
-            <button onclick="showRewardAd()" class="w-full py-3.5 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black rounded-2xl shadow-lg shadow-amber-500/20 transition flex items-center justify-center gap-2 active:scale-95 text-sm">
+            <button onclick="showRewardAd()" class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black rounded-2xl shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2 active:scale-95 text-sm">
                 <i class="fa-solid fa-circle-dollar-to-slot"></i> مشاهدة إعلان (+10 TOM مكافأة)
             </button>
         </div>
@@ -257,8 +271,13 @@
         let chickStock = parseFloat(localStorage.getItem('tom_chicks') || '0.00');
         let currentLevel = parseInt(localStorage.getItem('tom_level') || '1');
 
+        // Timer Hatching State Variables
+        let incubationStartTime = parseInt(localStorage.getItem('tom_incubation_start') || '0');
+        let incubationTimerEggs = parseFloat(localStorage.getItem('tom_incubation_eggs') || '0.00');
+        const INCUBATION_DURATION_MS = 5 * 60 * 1000; // 5 دقائق
+
         function getProductionRate(lvl) {
-            return 0.05 + (lvl - 1) * 0.02; // معدل إنتاج البيض
+            return 0.05 + (lvl - 1) * 0.02;
         }
 
         function getLevelCost(lvl) {
@@ -267,14 +286,12 @@
             return 15 * Math.pow(2, lvl - 2);
         }
 
-        // -------------------------------------------------------------
-        // 1. حساب الإنتاج في الخلفية (Offline Production - 3 Hours Limit)
-        // -------------------------------------------------------------
+        // Offline Production Calculation (3 Hours max)
         function calculateOfflineProduction() {
             let now = Date.now();
             let lastSave = parseInt(localStorage.getItem('tom_last_time') || now);
             let elapsedSeconds = (now - lastSave) / 1000;
-            let maxOfflineSeconds = 3 * 3600; // 3 ساعات = 10800 ثانية
+            let maxOfflineSeconds = 3 * 3600;
 
             if (elapsedSeconds > 5) {
                 let effectiveSeconds = Math.min(elapsedSeconds, maxOfflineSeconds);
@@ -294,20 +311,21 @@
             localStorage.setItem('tom_last_time', now);
         }
 
-        // Live Production Loop
+        // Live Game Loop
         setInterval(() => {
             let now = Date.now();
             let lastSave = parseInt(localStorage.getItem('tom_last_time') || now);
             let elapsedSeconds = (now - lastSave) / 1000;
 
-            // يتوقف العداد التلقائي إذا تجاوزت مدة عدم التفاعل 3 ساعات
             if (elapsedSeconds < 3 * 3600) {
                 let ratePerSec = (getProductionRate(currentLevel) / 5) * 3.33;
-                eggStock += ratePerSec * 0.5; // كل نصف ثانية
+                eggStock += ratePerSec * 0.5;
                 document.getElementById('egg-stock').innerText = eggStock.toFixed(2) + " بيضة";
                 localStorage.setItem('tom_eggs', eggStock);
             }
             localStorage.setItem('tom_last_time', now);
+
+            updateTimerUI();
         }, 500);
 
         // Stage 1: Collect Eggs
@@ -323,7 +341,7 @@
             alert(`تم جمع ${collected.toFixed(2)} بيضة بنجاح!`);
         }
 
-        // Stage 2: Transfer to Incubator
+        // Stage 2: Transfer Eggs to Incubator
         function transferToIncubator() {
             if (eggStock < 1) {
                 alert('لا يوجد بيض جاهز للجمع والتحويل إلى الفقاسة!');
@@ -338,28 +356,109 @@
         }
 
         // -------------------------------------------------------------
-        // 2. تفقيس الكتاكيت مشروط بمشاهدة الإعلان
+        // خيار التفقيس الأول: التفقيس الفوري بمشاهدة إعلان
         // -------------------------------------------------------------
-        function hatchChicksWithAd() {
+        function hatchChicksInstantAd() {
             if (incubatorStock < 1) {
-                alert('الفقاسة خالية! قم بنقل البيض للفقاسة أولاً لتتمكن من تفقيسه.');
+                alert('الفقاسة خالية! قم بنقل البيض للفقاسة أولاً للتفقيس الفوري.');
                 return;
             }
 
             if (adController) {
                 adController.show().then(() => {
-                    let hatched = incubatorStock * 0.95; // نسبة التفقيس 95%
+                    let hatched = incubatorStock * 0.95;
                     chickStock += hatched;
                     incubatorStock = 0.00;
                     localStorage.setItem('tom_incubator', incubatorStock);
                     localStorage.setItem('tom_chicks', chickStock);
                     updateDisplays();
-                    alert(`تهانينا! أتممت الإعلان وتم تفقيس واستخراج ${hatched.toFixed(2)} كتكوت بنجاح!`);
+                    alert(`⚡ تم التفقيس الفوري بنجاح! استخرجت ${hatched.toFixed(2)} كتكوت.`);
                 }).catch((err) => {
-                    alert('يلزم مشاهدة الإعلان بالكامل لتشغيل المفرخة واستخراج الكتاكيت!');
+                    alert('يلزم مشاهدة الإعلان بالكامل لتأكيد التفقيس الفوري!');
                 });
             } else {
                 alert('جاري اتصال نظام الإعلانات، يرجى إعادة المحاولة خلال لحظات.');
+            }
+        }
+
+        // -------------------------------------------------------------
+        // خيار التفقيس الثاني: التفقيس العادي بالمؤقت (5 دقائق)
+        // -------------------------------------------------------------
+        function handleTimerIncubation() {
+            let now = Date.now();
+
+            // 1. حالة استلام الكتاكيت بعد اكتمال الـ 5 دقائق
+            if (incubationStartTime > 0 && (now - incubationStartTime >= INCUBATION_DURATION_MS)) {
+                let hatched = incubationTimerEggs * 0.95;
+                chickStock += hatched;
+                incubationTimerEggs = 0;
+                incubationStartTime = 0;
+
+                localStorage.setItem('tom_incubation_eggs', '0');
+                localStorage.setItem('tom_incubation_start', '0');
+                localStorage.setItem('tom_chicks', chickStock);
+                
+                updateDisplays();
+                alert(`🐣 اكتمل التفقيس! تم استلام ${hatched.toFixed(2)} كتكوت بنجاح.`);
+                return;
+            }
+
+            // 2. حالة التفقيس جاري بالفعل
+            if (incubationStartTime > 0 && (now - incubationStartTime < INCUBATION_DURATION_MS)) {
+                alert('الفقاسة تعمل حالياً! يرجى الانتظار حتى انتهاء مؤقت الـ 5 دقائق.');
+                return;
+            }
+
+            // 3. حالة بدء مؤقت تفقيس جديد
+            if (incubatorStock < 1) {
+                alert('الفقاسة خالية! قم بنقل البيض للفقاسة أولاً قبل تشغيل المؤقت.');
+                return;
+            }
+
+            incubationTimerEggs = incubatorStock;
+            incubatorStock = 0;
+            incubationStartTime = Date.now();
+
+            localStorage.setItem('tom_incubator', '0');
+            localStorage.setItem('tom_incubation_eggs', incubationTimerEggs);
+            localStorage.setItem('tom_incubation_start', incubationStartTime);
+
+            updateDisplays();
+            alert('⏱️ تم تشغيل الفقاسة! اكتمل التفقيس خلال 5 دقائق.');
+        }
+
+        // تحديث واجهة المؤقت بشكل حي
+        function updateTimerUI() {
+            let now = Date.now();
+            let badge = document.getElementById('timer-status-badge');
+            let btn = document.getElementById('timer-hatch-btn');
+
+            if (!badge || !btn) return;
+
+            if (incubationStartTime === 0 || incubationTimerEggs === 0) {
+                badge.innerText = '05:00';
+                badge.className = 'font-mono font-bold text-slate-400';
+                btn.innerHTML = '<i class="fa-solid fa-stopwatch"></i> تشغيل الفقاسة (5 دقائق)';
+                btn.className = 'w-full py-2.5 bg-red-600 hover:bg-red-500 text-white font-bold rounded-lg text-xs transition shadow-md flex items-center justify-center gap-2 active:scale-95';
+                return;
+            }
+
+            let elapsed = now - incubationStartTime;
+            if (elapsed >= INCUBATION_DURATION_MS) {
+                badge.innerText = 'جاهز للاستلام!';
+                badge.className = 'font-mono font-bold text-emerald-400 animate-pulse';
+                btn.innerHTML = `<i class="fa-solid fa-basket-shopping"></i> استلام الكتاكيت الجاهزة (${(incubationTimerEggs * 0.95).toFixed(2)})`;
+                btn.className = 'w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs transition shadow-md flex items-center justify-center gap-2 active:scale-95';
+            } else {
+                let remainingSeconds = Math.ceil((INCUBATION_DURATION_MS - elapsed) / 1000);
+                let mins = Math.floor(remainingSeconds / 60);
+                let secs = remainingSeconds % 60;
+                let formattedTime = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+                badge.innerText = formattedTime;
+                badge.className = 'font-mono font-bold text-amber-400';
+                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري التفقيس (${formattedTime})`;
+                btn.className = 'w-full py-2.5 bg-slate-800 text-amber-400 font-bold rounded-lg text-xs border border-amber-500/30 flex items-center justify-center gap-2';
             }
         }
 
@@ -512,6 +611,7 @@
             updateDisplays();
             renderLevels();
             checkDailyStatus();
+            updateTimerUI();
         };
     </script>
 </body>
