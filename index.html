@@ -3,616 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOM Hatchery - مفرخة الدواجن الذكية</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>TOM Hatchery</title>
+    
+    <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Adsgram SDK -->
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
+    
     <style>
-        body { background-color: #020617; color: #f8fafc; font-family: Tahoma, sans-serif; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .glow-box { box-shadow: 0 0 40px rgba(16, 185, 129, 0.2); }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #020617; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--tg-theme-bg-color, #1a1a1a);
+            color: var(--tg-theme-text-color, #ffffff);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        .container {
+            background: var(--tg-theme-secondary-bg-color, #2a2a2a);
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 25px;
+        }
+        .btn {
+            background-color: #0088cc;
+            color: #ffffff;
+            border: none;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        .btn:disabled {
+            background-color: #555555;
+            cursor: not-allowed;
+        }
+        #status {
+            margin-top: 18px;
+            font-size: 14px;
+            font-weight: bold;
+        }
     </style>
 </head>
-<body class="min-h-screen pb-28 select-none">
+<body>
 
-    <!-- Top Bar -->
-    <div class="flex justify-between items-center p-3.5 bg-slate-900/95 border-b border-slate-800 text-xs backdrop-blur-md sticky top-0 z-40 shadow-md">
-        <div>المفرخة: <span class="text-emerald-400 font-extrabold" id="top-hatch-capacity">سعة 130 بيضة</span></div>
-        <div class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 font-mono">PRO FARM v4.5</div>
-        <div>المستوى: <span class="text-amber-400 font-extrabold" id="top-level-badge">1 🐣</span></div>
-    </div>
-
-    <!-- Main Container -->
-    <div class="max-w-md mx-auto p-4">
-
-        <!-- 1. HATCHERY & PRODUCTION TAB (دورة الإنتاج) -->
-        <div id="view-mine" class="tab-content active space-y-4">
-            
-            <!-- Wallet Balance -->
-            <div class="flex items-center justify-between bg-slate-900 border border-slate-800 p-3.5 rounded-2xl shadow-xl">
-                <div class="flex items-center gap-2.5">
-                    <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                        <i class="fa-solid fa-wallet text-lg"></i>
-                    </div>
-                    <div>
-                        <div class="text-[11px] text-slate-400">أرباح الخزينة</div>
-                        <div class="font-black text-base text-white"><span id="wallet-balance">0.00</span> <span class="text-xs text-amber-400">TOM</span></div>
-                    </div>
-                </div>
-                <div class="text-left">
-                    <div class="text-[10px] text-emerald-400 font-bold" id="usd-value">~$0.00 USD</div>
-                </div>
-            </div>
-
-            <!-- Offline Banner Status -->
-            <div id="offline-status-banner" class="hidden bg-emerald-950/80 border border-emerald-500/30 p-2.5 rounded-xl text-xs text-emerald-300 flex justify-between items-center">
-                <span><i class="fa-solid fa-moon ml-1"></i> إنتاج الخلفية أثناء غيابك:</span>
-                <span id="offline-produced-count" class="font-bold font-mono text-amber-300">+0.00 بيضة</span>
-            </div>
-
-            <!-- Stage 1: Mother Hens & Eggs Collection -->
-            <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl shadow-lg relative overflow-hidden">
-                <div class="flex justify-between items-center mb-1">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-feather text-amber-400"></i>
-                        <h3 class="font-bold text-sm">قطعان أمهات البياض</h3>
-                    </div>
-                    <span class="text-[10px] bg-amber-500/10 text-amber-400 px-2 py-0.5 rounded border border-amber-500/20 font-bold">4 دجاجات + ديك</span>
-                </div>
-                <p class="text-[11px] text-slate-400 mb-3">حد الإنتاج المستمر في الغياب: <span class="text-amber-300 font-bold">3 ساعات أقصى حد</span></p>
-                
-                <div class="flex justify-between items-center bg-slate-950 p-3 rounded-xl border border-slate-800 mb-1">
-                    <div>
-                        <div class="text-[11px] text-slate-400">البيض المجمع جاهز:</div>
-                        <div class="text-lg font-black text-amber-300 font-mono" id="egg-stock">0.00 بيضة</div>
-                    </div>
-                    <button onclick="collectEggs()" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs transition shadow-md active:scale-95">
-                        <i class="fa-solid fa-basket-shopping ml-1"></i> جمع البيض
-                    </button>
-                </div>
-            </div>
-
-            <!-- Stage 2: Incubator & Hatching (خياران للتفقيس) -->
-            <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl shadow-lg space-y-3">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-temperature-high text-red-400"></i>
-                        <h3 class="font-bold text-sm">عنابر التفقيس (الفقاسة الآلية)</h3>
-                    </div>
-                    <span class="text-[10px] bg-red-500/10 text-red-400 px-2 py-0.5 rounded border border-red-500/20 font-bold">خيارات التفقيس</span>
-                </div>
-
-                <div class="flex justify-between items-center bg-slate-950 p-3 rounded-xl border border-slate-800">
-                    <div>
-                        <div class="text-[11px] text-slate-400">بيض داخل الفقاسة:</div>
-                        <div class="text-lg font-black text-red-300 font-mono" id="incubator-stock">0.00 بيضة</div>
-                    </div>
-                    <button onclick="transferToIncubator()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-xl text-xs transition border border-slate-700">
-                        <i class="fa-solid fa-arrow-down-long ml-1"></i> نقل للفقاسة
-                    </button>
-                </div>
-
-                <!-- Hatching Options Box -->
-                <div class="grid grid-cols-1 gap-2 pt-1">
-                    <!-- Option 1: Instant Ad Hatch -->
-                    <button onclick="hatchChicksInstantAd()" class="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black rounded-xl text-xs transition shadow-md flex items-center justify-center gap-2 active:scale-95">
-                        <i class="fa-solid fa-bolt text-sm"></i> ⚡ تفقيس فوري (مشاهدة إعلان)
-                    </button>
-
-                    <!-- Option 2: 5-Minute Timer Hatch -->
-                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 flex flex-col gap-2">
-                        <div class="flex justify-between items-center text-xs">
-                            <span class="text-slate-400">تفقيس عادي بالتايمر:</span>
-                            <span id="timer-status-badge" class="font-mono font-bold text-slate-400">05:00</span>
-                        </div>
-                        <button id="timer-hatch-btn" onclick="handleTimerIncubation()" class="w-full py-2.5 bg-red-600 hover:bg-red-500 text-white font-bold rounded-lg text-xs transition shadow-md flex items-center justify-center gap-2 active:scale-95">
-                            <i class="fa-solid fa-stopwatch"></i> تشغيل الفقاسة (5 دقائق)
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stage 3 & 4: Chick Extraction & Sales Pens -->
-            <div class="bg-slate-900/90 border border-slate-800 p-4 rounded-2xl shadow-lg glow-box">
-                <div class="flex justify-between items-center mb-2">
-                    <div class="flex items-center gap-2">
-                        <i class="fa-solid fa-kiwi-bird text-emerald-400"></i>
-                        <h3 class="font-bold text-sm">خروج الكتاكيت وعنابر العرض</h3>
-                    </div>
-                    <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20 font-bold">جاهز للبيع</span>
-                </div>
-                <p class="text-xs text-slate-400 mb-3">فرز الكتاكيت الخارجة وعرضها للبيع في السوق المحلي.</p>
-
-                <div class="flex justify-between items-center bg-slate-950 p-3 rounded-xl border border-slate-800 mb-3">
-                    <div>
-                        <div class="text-[11px] text-slate-400">كتاكيت جاهزة للبيع:</div>
-                        <div class="text-xl font-black text-emerald-400 font-mono" id="chick-stock">0.00 كتكوت</div>
-                    </div>
-                    <button onclick="sellChicks()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-xl text-xs transition shadow-md active:scale-95">
-                        <i class="fa-solid fa-coins ml-1"></i> بيع وقبض الثمن
-                    </button>
-                </div>
-            </div>
-
-            <!-- Booster Ad Button -->
-            <button onclick="showRewardAd()" class="w-full py-3.5 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black rounded-2xl shadow-lg shadow-emerald-500/20 transition flex items-center justify-center gap-2 active:scale-95 text-sm">
-                <i class="fa-solid fa-circle-dollar-to-slot"></i> مشاهدة إعلان (+10 TOM مكافأة)
-            </button>
-        </div>
-
-        <!-- 2. PENS & LEVELS TAB -->
-        <div id="view-boost" class="tab-content space-y-3">
-            <div class="flex justify-between items-center mb-2">
-                <div>
-                    <h2 class="text-lg font-bold">تطوير عنابر المفرخة (1 - 50)</h2>
-                    <p class="text-xs text-slate-400">كل ترقية تزيد من سعة الأمهات وسرعة التفقيس</p>
-                </div>
-            </div>
-            <div id="levels-container" class="space-y-2.5 max-h-[65vh] overflow-y-auto pr-1"></div>
-        </div>
-
-        <!-- 3. QUESTS TAB -->
-        <div id="view-quests" class="tab-content space-y-3">
-            <h2 class="text-lg font-bold">مهام المزرعة اليومية</h2>
-            <p class="text-xs text-slate-400 mb-4">نفذ مهام الفحص اليومي لكسب أطقم دجاج إضافية</p>
-            
-            <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center justify-between shadow-md">
-                <div>
-                    <h4 class="font-bold text-sm">فحص معدات التفقيس اليومي</h4>
-                    <p class="text-xs text-amber-400 font-bold" id="daily-status">+10 TOM مكافأة</p>
-                </div>
-                <button id="daily-btn" onclick="claimDailyCheckin()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-xs font-bold transition">استلام</button>
-            </div>
-        </div>
-
-        <!-- 4. FRIENDS TAB -->
-        <div id="view-friends" class="tab-content space-y-4">
-            <h2 class="text-lg font-bold">شبكة المربين والموزعين</h2>
-            <p class="text-xs text-slate-400">ادع أصدقاءك لربط مفرختهم بشبكتك واكسب مكافآت فورية.</p>
-            
-            <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-lg">
-                <span class="text-xs text-slate-400">رابط دعوة المربين</span>
-                <div class="bg-slate-950 p-2.5 rounded-xl text-xs text-emerald-400 truncate mt-1 mb-3 border border-slate-800" id="ref-link">Loading...</div>
-                <button onclick="copyRefLink()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-xs font-bold transition shadow-md">مشاركة عبر تليجرام</button>
-            </div>
-        </div>
-
-        <!-- 5. PROFILE TAB -->
-        <div id="view-profile" class="tab-content space-y-4">
-            <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl flex items-center gap-3 shadow-lg">
-                <div class="w-12 h-12 rounded-full bg-emerald-500 flex items-center justify-center font-bold text-slate-950 text-xl shadow-md" id="user-initial">U</div>
-                <div>
-                    <h3 class="font-bold text-sm" id="user-name">المربي</h3>
-                    <p class="text-xs text-slate-400 font-mono" id="user-id">ID: --</p>
-                </div>
-            </div>
-
-            <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl space-y-3 shadow-lg">
-                <div class="flex justify-between text-sm">
-                    <span class="text-slate-400">إجمالي الأرباح:</span>
-                    <span class="font-bold text-amber-400" id="profile-total">0.00 TOM</span>
-                </div>
-                <div class="flex justify-between text-sm">
-                    <span class="text-slate-400">مستوى المفرخة الحالي:</span>
-                    <span class="font-bold text-emerald-400" id="profile-level">المستوى 1</span>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- Bottom Navigation Bar -->
-    <div class="fixed bottom-0 left-0 right-0 bg-slate-950/95 backdrop-blur-lg border-t border-slate-800 flex justify-around py-3 max-w-md mx-auto z-50 text-xs shadow-2xl">
-        <button onclick="switchTab('mine')" class="nav-btn text-emerald-400 flex flex-col items-center gap-1 transition" data-target="mine">
-            <i class="fa-solid fa-house-chimney text-lg"></i> المفرخة
-        </button>
-        <button onclick="switchTab('boost')" class="nav-btn text-slate-400 hover:text-slate-200 flex flex-col items-center gap-1 transition" data-target="boost">
-            <i class="fa-solid fa-layer-group text-lg"></i> العنابر
-        </button>
-        <button onclick="switchTab('quests')" class="nav-btn text-slate-400 hover:text-slate-200 flex flex-col items-center gap-1 transition" data-target="quests">
-            <i class="fa-solid fa-star text-lg"></i> المهام
-        </button>
-        <button onclick="switchTab('friends')" class="nav-btn text-slate-400 hover:text-slate-200 flex flex-col items-center gap-1 transition" data-target="friends">
-            <i class="fa-solid fa-users text-lg"></i> المربين
-        </button>
-        <button onclick="switchTab('profile')" class="nav-btn text-slate-400 hover:text-slate-200 flex flex-col items-center gap-1 transition" data-target="profile">
-            <i class="fa-solid fa-user-gear text-lg"></i> الملف
-        </button>
+    <div class="container">
+        <h1>🐣 TOM Hatchery</h1>
+        <p>شاهد الإعلان للحصول على المكافأة الفورية!</p>
+        
+        <button class="btn" id="adBtn" onclick="showRewardAd()">📺 مشاهدة الإعلان</button>
+        
+        <div id="status"></div>
     </div>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
-
-        let userId = "6773951150";
-        let userName = "المربي";
-
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            userId = tg.initDataUnsafe.user.id;
-            userName = tg.initDataUnsafe.user.first_name || "المربي";
+        // تهيئة تطبيق تليجرام المصغر
+        if (window.Telegram && window.Telegram.WebApp) {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
         }
 
-        document.getElementById('user-name').innerText = userName;
-        document.getElementById('user-id').innerText = "ID: " + userId;
-        document.getElementById('user-initial').innerText = userName.charAt(0).toUpperCase();
-
-        let botUsername = "EarnTapAdssbot";
-        let refLink = `https://t.me/${botUsername}/app?start=ref_${userId}`;
-        document.getElementById('ref-link').innerText = refLink;
-
-        function copyRefLink() {
-            navigator.clipboard.writeText(refLink);
-            alert('تم نسخ رابط شبكة المربين بنجاح!');
-        }
-
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.getElementById('view-' + tabName).classList.add('active');
-            
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('text-emerald-400');
-                btn.classList.add('text-slate-400');
-                if(btn.dataset.target === tabName) {
-                    btn.classList.remove('text-slate-400');
-                    btn.classList.add('text-emerald-400');
-                }
-            });
-        }
-
-        // Game State Variables
-        let walletBalance = parseFloat(localStorage.getItem('tom_balance') || '0.00');
-        let eggStock = parseFloat(localStorage.getItem('tom_eggs') || '0.00');
-        let incubatorStock = parseFloat(localStorage.getItem('tom_incubator') || '0.00');
-        let chickStock = parseFloat(localStorage.getItem('tom_chicks') || '0.00');
-        let currentLevel = parseInt(localStorage.getItem('tom_level') || '1');
-
-        // Timer Hatching State Variables
-        let incubationStartTime = parseInt(localStorage.getItem('tom_incubation_start') || '0');
-        let incubationTimerEggs = parseFloat(localStorage.getItem('tom_incubation_eggs') || '0.00');
-        const INCUBATION_DURATION_MS = 5 * 60 * 1000; // 5 دقائق
-
-        function getProductionRate(lvl) {
-            return 0.05 + (lvl - 1) * 0.02;
-        }
-
-        function getLevelCost(lvl) {
-            if (lvl <= 1) return 0;
-            if (lvl === 2) return 15;
-            return 15 * Math.pow(2, lvl - 2);
-        }
-
-        // Offline Production Calculation (3 Hours max)
-        function calculateOfflineProduction() {
-            let now = Date.now();
-            let lastSave = parseInt(localStorage.getItem('tom_last_time') || now);
-            let elapsedSeconds = (now - lastSave) / 1000;
-            let maxOfflineSeconds = 3 * 3600;
-
-            if (elapsedSeconds > 5) {
-                let effectiveSeconds = Math.min(elapsedSeconds, maxOfflineSeconds);
-                let ratePerSec = (getProductionRate(currentLevel) / 5) * 3.33; 
-                let offlineEggs = ratePerSec * effectiveSeconds;
-
-                if (offlineEggs > 0) {
-                    eggStock += offlineEggs;
-                    localStorage.setItem('tom_eggs', eggStock);
-                    
-                    let banner = document.getElementById('offline-status-banner');
-                    let countSpan = document.getElementById('offline-produced-count');
-                    banner.classList.remove('hidden');
-                    countSpan.innerText = `+${offlineEggs.toFixed(2)} بيضة`;
-                }
-            }
-            localStorage.setItem('tom_last_time', now);
-        }
-
-        // Live Game Loop
-        setInterval(() => {
-            let now = Date.now();
-            let lastSave = parseInt(localStorage.getItem('tom_last_time') || now);
-            let elapsedSeconds = (now - lastSave) / 1000;
-
-            if (elapsedSeconds < 3 * 3600) {
-                let ratePerSec = (getProductionRate(currentLevel) / 5) * 3.33;
-                eggStock += ratePerSec * 0.5;
-                document.getElementById('egg-stock').innerText = eggStock.toFixed(2) + " بيضة";
-                localStorage.setItem('tom_eggs', eggStock);
-            }
-            localStorage.setItem('tom_last_time', now);
-
-            updateTimerUI();
-        }, 500);
-
-        // Stage 1: Collect Eggs
-        function collectEggs() {
-            if (eggStock < 1) {
-                alert('انتظر قليلاً حتى تنتج الأمهات بيضاً كافياً للجمع!');
-                return;
-            }
-            let collected = eggStock;
-            eggStock = 0.00;
-            localStorage.setItem('tom_eggs', eggStock);
-            updateDisplays();
-            alert(`تم جمع ${collected.toFixed(2)} بيضة بنجاح!`);
-        }
-
-        // Stage 2: Transfer Eggs to Incubator
-        function transferToIncubator() {
-            if (eggStock < 1) {
-                alert('لا يوجد بيض جاهز للجمع والتحويل إلى الفقاسة!');
-                return;
-            }
-            incubatorStock += eggStock;
-            eggStock = 0.00;
-            localStorage.setItem('tom_eggs', eggStock);
-            localStorage.setItem('tom_incubator', incubatorStock);
-            updateDisplays();
-            alert('تم نقل البيض بنجاح داخل الفقاسة الآلية!');
-        }
-
-        // -------------------------------------------------------------
-        // خيار التفقيس الأول: التفقيس الفوري بمشاهدة إعلان
-        // -------------------------------------------------------------
-        function hatchChicksInstantAd() {
-            if (incubatorStock < 1) {
-                alert('الفقاسة خالية! قم بنقل البيض للفقاسة أولاً للتفقيس الفوري.');
-                return;
-            }
-
-            if (adController) {
-                adController.show().then(() => {
-                    let hatched = incubatorStock * 0.95;
-                    chickStock += hatched;
-                    incubatorStock = 0.00;
-                    localStorage.setItem('tom_incubator', incubatorStock);
-                    localStorage.setItem('tom_chicks', chickStock);
-                    updateDisplays();
-                    alert(`⚡ تم التفقيس الفوري بنجاح! استخرجت ${hatched.toFixed(2)} كتكوت.`);
-                }).catch((err) => {
-                    alert('يلزم مشاهدة الإعلان بالكامل لتأكيد التفقيس الفوري!');
-                });
-            } else {
-                alert('جاري اتصال نظام الإعلانات، يرجى إعادة المحاولة خلال لحظات.');
-            }
-        }
-
-        // -------------------------------------------------------------
-        // خيار التفقيس الثاني: التفقيس العادي بالمؤقت (5 دقائق)
-        // -------------------------------------------------------------
-        function handleTimerIncubation() {
-            let now = Date.now();
-
-            // 1. حالة استلام الكتاكيت بعد اكتمال الـ 5 دقائق
-            if (incubationStartTime > 0 && (now - incubationStartTime >= INCUBATION_DURATION_MS)) {
-                let hatched = incubationTimerEggs * 0.95;
-                chickStock += hatched;
-                incubationTimerEggs = 0;
-                incubationStartTime = 0;
-
-                localStorage.setItem('tom_incubation_eggs', '0');
-                localStorage.setItem('tom_incubation_start', '0');
-                localStorage.setItem('tom_chicks', chickStock);
-                
-                updateDisplays();
-                alert(`🐣 اكتمل التفقيس! تم استلام ${hatched.toFixed(2)} كتكوت بنجاح.`);
-                return;
-            }
-
-            // 2. حالة التفقيس جاري بالفعل
-            if (incubationStartTime > 0 && (now - incubationStartTime < INCUBATION_DURATION_MS)) {
-                alert('الفقاسة تعمل حالياً! يرجى الانتظار حتى انتهاء مؤقت الـ 5 دقائق.');
-                return;
-            }
-
-            // 3. حالة بدء مؤقت تفقيس جديد
-            if (incubatorStock < 1) {
-                alert('الفقاسة خالية! قم بنقل البيض للفقاسة أولاً قبل تشغيل المؤقت.');
-                return;
-            }
-
-            incubationTimerEggs = incubatorStock;
-            incubatorStock = 0;
-            incubationStartTime = Date.now();
-
-            localStorage.setItem('tom_incubator', '0');
-            localStorage.setItem('tom_incubation_eggs', incubationTimerEggs);
-            localStorage.setItem('tom_incubation_start', incubationStartTime);
-
-            updateDisplays();
-            alert('⏱️ تم تشغيل الفقاسة! اكتمل التفقيس خلال 5 دقائق.');
-        }
-
-        // تحديث واجهة المؤقت بشكل حي
-        function updateTimerUI() {
-            let now = Date.now();
-            let badge = document.getElementById('timer-status-badge');
-            let btn = document.getElementById('timer-hatch-btn');
-
-            if (!badge || !btn) return;
-
-            if (incubationStartTime === 0 || incubationTimerEggs === 0) {
-                badge.innerText = '05:00';
-                badge.className = 'font-mono font-bold text-slate-400';
-                btn.innerHTML = '<i class="fa-solid fa-stopwatch"></i> تشغيل الفقاسة (5 دقائق)';
-                btn.className = 'w-full py-2.5 bg-red-600 hover:bg-red-500 text-white font-bold rounded-lg text-xs transition shadow-md flex items-center justify-center gap-2 active:scale-95';
-                return;
-            }
-
-            let elapsed = now - incubationStartTime;
-            if (elapsed >= INCUBATION_DURATION_MS) {
-                badge.innerText = 'جاهز للاستلام!';
-                badge.className = 'font-mono font-bold text-emerald-400 animate-pulse';
-                btn.innerHTML = `<i class="fa-solid fa-basket-shopping"></i> استلام الكتاكيت الجاهزة (${(incubationTimerEggs * 0.95).toFixed(2)})`;
-                btn.className = 'w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs transition shadow-md flex items-center justify-center gap-2 active:scale-95';
-            } else {
-                let remainingSeconds = Math.ceil((INCUBATION_DURATION_MS - elapsed) / 1000);
-                let mins = Math.floor(remainingSeconds / 60);
-                let secs = remainingSeconds % 60;
-                let formattedTime = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-
-                badge.innerText = formattedTime;
-                badge.className = 'font-mono font-bold text-amber-400';
-                btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري التفقيس (${formattedTime})`;
-                btn.className = 'w-full py-2.5 bg-slate-800 text-amber-400 font-bold rounded-lg text-xs border border-amber-500/30 flex items-center justify-center gap-2';
-            }
-        }
-
-        // Stage 4: Sell Chicks for Balance
-        function sellChicks() {
-            if (chickStock < 1) {
-                alert('عنابر العرض خالية من الكتاكيت حالياً!');
-                return;
-            }
-            let earned = chickStock * 1.5;
-            walletBalance += earned;
-            chickStock = 0.00;
-            localStorage.setItem('tom_balance', walletBalance);
-            localStorage.setItem('tom_chicks', chickStock);
-            updateDisplays();
-            renderLevels();
-            alert(`تم بيع الكتاكيت بنجاح وتحويل ${earned.toFixed(2)} TOM إلى خزينة المفرخة!`);
-        }
-
-        function checkDailyStatus() {
-            let lastCheckin = localStorage.getItem('tom_last_checkin');
-            let today = new Date().toDateString();
-            let btn = document.getElementById('daily-btn');
-
-            if (lastCheckin === today) {
-                btn.innerText = 'تم الاستلام';
-                btn.disabled = true;
-                btn.className = 'px-4 py-2 bg-slate-800 text-emerald-400 rounded-xl text-xs font-bold cursor-not-allowed';
-            }
-        }
-
-        function claimDailyCheckin() {
-            let lastCheckin = localStorage.getItem('tom_last_checkin');
-            let today = new Date().toDateString();
-
-            if (lastCheckin === today) {
-                alert('لقد استلمت فحص اليوم بالفعل!');
-                return;
-            }
-
-            walletBalance += 10;
-            localStorage.setItem('tom_balance', walletBalance);
-            localStorage.setItem('tom_last_checkin', today);
-            
-            updateDisplays();
-            checkDailyStatus();
-            alert('تم استلام مكافأة الفحص اليومي (+10 TOM) بنجاح!');
-        }
-
-        function upgradeLevel(targetLevel) {
-            let cost = getLevelCost(targetLevel);
-            if (walletBalance >= cost) {
-                walletBalance -= cost;
-                currentLevel = targetLevel;
-                localStorage.setItem('tom_balance', walletBalance);
-                localStorage.setItem('tom_level', currentLevel);
-                updateDisplays();
-                renderLevels();
-                alert(`مبروك! تم ترقية عنبر المفرخة إلى المستوى ${currentLevel} بنجاح.`);
-            } else {
-                alert(`رصيدك غير كافٍ! تحتاج إلى ${cost} TOM لفتح هذا العنبر.`);
-            }
-        }
-
-        function renderLevels() {
-            let container = document.getElementById('levels-container');
-            container.innerHTML = '';
-
-            for (let i = 1; i <= 50; i++) {
-                let cost = getLevelCost(i);
-                let isCurrent = (i === currentLevel);
-                let isCompleted = (i < currentLevel);
-                let isNext = (i === currentLevel + 1);
-                let canAfford = (walletBalance >= cost);
-
-                let statusBadge = '';
-                let btnHTML = '';
-
-                if (isCompleted) {
-                    statusBadge = `<span class="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">مكتمل</span>`;
-                    btnHTML = `<div class="py-1 px-3 bg-slate-800 text-slate-500 text-xs rounded-xl font-bold text-center">نشط سابقاً</div>`;
-                } else if (isCurrent) {
-                    statusBadge = `<span class="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">الحالي</span>`;
-                    btnHTML = `<div class="py-1 px-3 bg-emerald-500/20 text-emerald-400 text-xs rounded-xl font-bold text-center">المستوى الحالي</div>`;
-                } else if (isNext) {
-                    statusBadge = `<span class="text-xs text-amber-400 font-bold bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">${cost} TOM</span>`;
-                    btnHTML = `<button onclick="upgradeLevel(${i})" class="py-1.5 px-3 ${canAfford ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-md' : 'bg-slate-800 text-slate-500 cursor-not-allowed'} text-xs rounded-xl font-bold transition">ترقية العنبر</button>`;
-                } else {
-                    statusBadge = `<span class="text-xs text-slate-500 font-bold bg-slate-800/50 px-2 py-0.5 rounded">${cost} TOM</span>`;
-                    btnHTML = `<button disabled class="py-1.5 px-3 bg-slate-900 text-slate-600 text-xs rounded-xl font-bold cursor-not-allowed">مغلق</button>`;
-                }
-
-                let cardClass = isCurrent ? 'border-emerald-500/50 bg-slate-900/90' : (isCompleted ? 'border-slate-800 bg-slate-950/60 opacity-80' : (isNext ? 'border-amber-500/30 bg-slate-900/60' : 'border-slate-800/80 bg-slate-950/40 opacity-70'));
-
-                let html = `
-                    <div class="border ${cardClass} p-3 rounded-2xl flex items-center justify-between shadow-md transition">
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <h3 class="font-bold text-sm text-white">عنبر مستوى ${i}</h3>
-                                ${statusBadge}
-                            </div>
-                            <p class="text-xs text-slate-400 mt-0.5">أطقم الأمهات: <span class="text-amber-400 font-mono">${i} أطقم (4+1)</span></p>
-                        </div>
-                        <div>${btnHTML}</div>
-                    </div>
-                `;
-                container.innerHTML += html;
-            }
-        }
-
-        // Adsgram Integration Setup
-        let adController = null;
-        try {
-            if (window.Adsgram) {
-                adController = window.Adsgram.init({ blockId: "46651" });
-            }
-        } catch(e) {}
+        // تهيئة إعلانات Adsgram باستخدام الـ Block ID الجديد
+        const AdController = window.Adsgram.init({ 
+            blockId: "46819" 
+        });
 
         function showRewardAd() {
-            if (adController) {
-                adController.show().then(() => {
-                    walletBalance += 10.0;
-                    localStorage.setItem('tom_balance', walletBalance);
-                    updateDisplays();
-                    alert('تم منحك مكافأة مشاهدة الإعلان (+10 TOM)!');
-                }).catch((err) => {
-                    alert('تعذر تشغيل الإعلان حالياً.');
-                });
-            } else {
-                alert('جاري إعداد نظام الإعلانات، يرجى المحاولة لاحقاً.');
-            }
-        }
-
-        function updateDisplays() {
-            document.getElementById('wallet-balance').innerText = walletBalance.toFixed(2);
-            document.getElementById('profile-total').innerText = walletBalance.toFixed(2) + ' TOM';
-            document.getElementById('profile-level').innerText = `المستوى ${currentLevel}`;
-            document.getElementById('top-level-badge').innerText = `${currentLevel} 🐣`;
+            const statusDiv = document.getElementById('status');
+            const btn = document.getElementById('adBtn');
             
-            document.getElementById('egg-stock').innerText = eggStock.toFixed(2) + " بيضة";
-            document.getElementById('incubator-stock').innerText = incubatorStock.toFixed(2) + " بيضة";
-            document.getElementById('chick-stock').innerText = chickStock.toFixed(2) + " كتكوت";
+            statusDiv.innerText = "جاري تحميل الإعلان...";
+            statusDiv.style.color = "#e67e22";
+            btn.disabled = true;
 
-            let usd = (walletBalance * 0.00145).toFixed(2);
-            document.getElementById('usd-value').innerText = `(~$${usd} USD)`;
+            AdController.show().then((result) => {
+                // تمت مشاهدة الإعلان بنجاح
+                statusDiv.innerText = "🎉 تم مشاهدة الإعلان بنجاح! تم إضافة المكافأة.";
+                statusDiv.style.color = "#2ecc71";
+                btn.disabled = false;
+            }).catch((result) => {
+                // حدث خطأ أو تعذر مشاهدة الإعلان
+                console.error("Ad Error / Skipped:", result);
+                statusDiv.innerText = "❌ لم تكتمل مشاهدة الإعلان أو لا يتوفر إعلان حالياً.";
+                statusDiv.style.color = "#e74c3c";
+                btn.disabled = false;
+            });
         }
-
-        window.onload = function() {
-            calculateOfflineProduction();
-            updateDisplays();
-            renderLevels();
-            checkDailyStatus();
-            updateTimerUI();
-        };
     </script>
+
 </body>
 </html>
